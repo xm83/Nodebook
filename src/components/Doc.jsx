@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import Modal from 'react-modal';
 import Button from './Button';
 import FormLine from './FormLine';
+import TextBox from './TextBox';
 
 const customStyles = {
   content : {
@@ -67,6 +68,7 @@ class Doc extends React.Component {
               </form>
             </Modal>
         </div>
+        <TextBox/>
       </div>
     )
   }

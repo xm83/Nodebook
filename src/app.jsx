@@ -1,7 +1,6 @@
 import React from 'react';
-import Login from './Login'
-import HomePage from './HomePage.js'
-import Doc from './Doc.js'
+import HomePage from './Components/HomePage'
+import Doc from './Components/Doc'
 
 export default class App extends React.Component {
   constructor(props) {
