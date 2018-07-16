@@ -29,15 +29,15 @@ class Doc extends React.Component {
     this.closeModal = this.closeModal.bind(this);
   }
 
-  openModal() {
+  openModal = () => {
     this.setState({modalIsOpen: true});
   }
 
-  afterOpenModal() {
+  afterOpenModal = () => {
     this.subtitle.style.color = '#f00';
   }
 
-  closeModal() {
+  closeModal = () => {
     this.setState({modalIsOpen: false});
   }
 
