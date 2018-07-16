@@ -52,6 +52,39 @@ app.post('/login', (req, res) => {
     .catch(err => res.json({ status: `Error: ${err}` }));
 });
 
+app.post('/savenewdocument', (req, res) => {
+  const newProject = new Project({
+    title: req.body.title,
+    owner: req.body.owner,
+    collaborators: [],
+    contents: '',
+  });
+  Project.save(newProject)
+    .then(res.json({ status: 200, message: 'Created New Project' }))
+    .catch(err => res.json({ status: `Error: ${err}` }));
+});
+
+app.post('/savenewcollaborator', (req, res) => {
+  Project.findById(req.body.projectId)
+    .then((project) => {
+      const newCollaboratorArr = project.collaborators;
+      newCollaboratorArr.push(req.body.newCollaborator);
+      Project.findByIdAndUpdate(project.id, { collaborators: newCollaboratorArr })
+      .then(res.json({ status: 200, message: 'Successfully Added Collaborator' }))
+      .catch(err => res.json({ status: `Error: ${err}` }));
+    });
+});
+
+app.post('/removecollaborator', (req, res) => {
+  Project.findById(req.body.projectId)
+    .then((project) => {
+      let newCollaboratorArr = project.collaborators;
+      newCollaboratorArr.splice(newCollaboratorArr.indexOf(req.body.collaboratorToBeRemoved), 1);
+      Project.findByIdAndUpdate(project.id, { collaborators: newCollaboratorArr })
+      .then(res.json({ status: 200, message: 'Successfully Added Collaborator' }))
+      .catch(err => res.json({ status: `Error: ${err}` }));
+    });
+});
 
 app.listen(process.env.port || 1337, () => { console.log('listening on port 1337') });
 
