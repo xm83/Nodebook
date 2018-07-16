@@ -9,6 +9,7 @@ class HomePage extends React.Component {
    this.state = {
      register: false,
    }
+   this.toggleReg = this.toggleReg.bind(this)
  }
 
  toggleReg = () => {
@@ -21,9 +22,9 @@ class HomePage extends React.Component {
    let reg = this.state.register
    console.log(reg)
    return (reg ?
-    ( <SignUp toggleReg={() => this.toggleReg()}/> )
+    ( <SignUp toggleReg={this.toggleReg}/> )
     :
-    ( <Login toggleReg={() => this.toggleReg()}/> )
+    ( <Login toggleReg={this.toggleReg} logIn={this.props.logIn}/> )
   );
  }
 }

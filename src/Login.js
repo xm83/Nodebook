@@ -17,7 +17,7 @@ class Login extends React.Component {
              <h4>
                  We hope you enjoy NAME HERE as much as we do, please login to your account below or register if this is your first time using our product
              </h4>
-             <LoginBlock toggleReg={this.props.toggleReg}/></center>
+             <LoginBlock toggleReg={this.props.toggleReg} logIn={this.props.logIn}/></center>
            </div>);
  }
 }
