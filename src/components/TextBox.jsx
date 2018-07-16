@@ -27,7 +27,7 @@ const styleMap = {
   },
 };
 
-export default class App extends React.Component {
+export default class TextBox extends React.Component {
   constructor(props) {
     super(props);
     this.state = { editorState: EditorState.createEmpty(), toggledColor: '#fff' };
