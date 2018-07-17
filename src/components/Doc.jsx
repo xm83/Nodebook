@@ -47,10 +47,10 @@ class Doc extends React.Component {
 
 
   render(){
-    console.log(this.props.id)
+    console.log(this.props)
     return (
       <div>
-        <h1> Here: {this.props.id} </h1>
+        <h1> Here: {this.props.id.firstName} </h1>
         <Button type="Home" onClick={()=>this.props.goHome()}/>
         <div>
           <Button type="Share" onClick={this.openModal}/>

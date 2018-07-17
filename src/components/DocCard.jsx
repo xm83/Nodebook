@@ -12,10 +12,11 @@ class DocCard extends React.Component {
   }
 
   render() {
+    console.log(this.props.user)
     return (
       <div>
         <p>{this.props.doc.title}</p>
-        <p> Owner: {this.props.doc.owner} </p>
+        <p> Owner: {this.props.user.firstName} {this.props.user.lastName} </p>
         <p> Collaboraters: {this.props.doc.collaborators} </p>
       </div>
     )
