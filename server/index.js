@@ -67,11 +67,11 @@ passport.use(new LocalStrategy((email, password, done) => {
 }));
 
 passport.serializeUser((user, done) => {
-  console.log('serialize user:', user);
+  //console.log('serialize user:', user);
   done(null, user._id); // does this need the '_', could it just be .id?
 });
 passport.deserializeUser((userId, done) => {
-  console.log('deserialize id:', userId);
+  //console.log('deserialize id:', userId);
   User.findById(userId, (err, user) => {
     if (err) {
       done(err);
@@ -81,6 +81,13 @@ passport.deserializeUser((userId, done) => {
   });
 });
 
+app.get('/currentUser', (req, res)  => {
+  if (!req.user) {
+    console.log('error')
+  } else {
+    res.send(req.user)
+  }
+})
 
 app.post('/login', passport.authenticate('local'), (req, res) => {
   res.redirect('/');
@@ -109,6 +116,8 @@ app.post('/register', (req, res) => {
 // universal route that checks if a user is logged in or not
 // from this point on, user would be logged in; i.e. req.user will be an obj instead of null
 app.use('/*', (req, res, next) => {
+  // console.log("wild card req.body", req.body);
+  // console.log("wild card req.body.user", req.body.user);
   if (!req.user) {
     res.json({ status: 400, message: 'user not logged in' });
   } else {
@@ -187,6 +196,7 @@ app.get('/loaduserprojects/', (req, res) => {
     .then(userProjects => res.json({ status: 200, message: 'Successfully Loaded Projects', projectObjects: userProjects }))
     .catch(err => res.json({ status: `Error: ${err}` }));
 });
+
 
 app.listen(process.env.port || 1337, () => { console.log('listening on port 1337') });
 

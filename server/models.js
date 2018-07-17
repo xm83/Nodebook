@@ -1,4 +1,8 @@
-const mongoose = require('mongoose');
+
+const mongoose = require('mongoose')
+var connect = process.env.MONGODB_URI
+
+mongoose.connect(connect)
 
 const Schema = mongoose.Schema;
 
@@ -21,7 +25,7 @@ const projectSchema = Schema({
 const User = mongoose.model('User', userSchema);
 const Project = mongoose.model('Project', projectSchema);
 
-export default {
+module.exports = {
   User: User,
   Project: Project,
 };
