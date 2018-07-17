@@ -5,6 +5,7 @@ import FormLine from './FormLine';
 import axios from 'axios'
 
 
+//This component is the actual form itself.
 class LoginBlock extends React.Component {
  constructor(props){
    super(props);

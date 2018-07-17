@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import Modal from 'react-modal';
 import Button from './Button';
 import FormLine from './FormLine';
+import TextBox from './TextBox';
 
 const customStyles = {
   content : {
@@ -16,6 +17,8 @@ const customStyles = {
 };
 
 Modal.setAppElement('#App')
+
+//This document is loaded based on an id, and will load all the information based on that
 
 class Doc extends React.Component {
   constructor(props) {
@@ -44,9 +47,11 @@ class Doc extends React.Component {
 
 
   render(){
+    console.log(this.props.id)
     return (
       <div>
-        <Button type="Home" onClick={()=>this.goHome()}/>
+        <h1> Here: {this.props.id} </h1>
+        <Button type="Home" onClick={()=>this.props.goHome()}/>
         <div>
           <Button type="Share" onClick={this.openModal}/>
           <Modal
@@ -67,6 +72,7 @@ class Doc extends React.Component {
               </form>
             </Modal>
         </div>
+        <TextBox/>
       </div>
     )
   }

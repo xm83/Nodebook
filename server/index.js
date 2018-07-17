@@ -135,6 +135,65 @@ app.get('/', (req, res) => {
   res.json({status: 200, message: "user logged in!"})
 });
 
+app.post('/savenewdocument', (req, res) => {
+  const newProject = new Project({
+    title: req.body.title,
+    owner: req.body.owner,
+    collaborators: [],
+    contents: '',
+  });
+  newProject.save()
+    .then(project => res.json({ status: 200, message: 'Created New Project', id: project.id }))
+    .catch(err => res.json({ status: `Error: ${err}` }));
+});
+
+//Might Have to Move the .then and .catch
+app.post('/savenewcollaborator', (req, res) => {
+  Project.findById(req.body.projectId)
+    .then((project) => {
+      const newCollaboratorArr = project.collaborators;
+      newCollaboratorArr.push(req.body.newCollaborator);
+      Project.findByIdAndUpdate(project.id, { collaborators: newCollaboratorArr })
+      .then(res.json({ status: 200, message: 'Successfully Added Collaborator' }))
+      .catch(err => res.json({ status: `Error: ${err}` }));
+    });
+});
+
+//Might Have to Move the .then and .catch
+app.post('/removecollaborator', (req, res) => {
+  Project.findById(req.body.projectId)
+    .exec()
+    .then((project) => {
+      const newCollaboratorArr = project.collaborators;
+      newCollaboratorArr.splice(newCollaboratorArr.indexOf(req.body.collaboratorToBeRemoved), 1);
+      Project.findByIdAndUpdate(project.id, { collaborators: newCollaboratorArr })
+      .then(res.json({ status: 200, message: 'Successfully Added Collaborator' }))
+      .catch(err => res.json({ status: `Error: ${err}` }));
+    });
+});
+
+app.get('/loaduserprojects/', (req, res) => {
+  Project.find()
+    .exec()
+    .then((projects) => {
+      const userProjects = [];
+      console.log(projects)
+      console.log(req.query.userid)
+      projects.forEach((element) => {
+        element.collaborators.forEach((elementTwo) => {
+          if (elementTwo === req.query.userid) {
+            userProjects.push(element);
+          }
+        });
+        if(element.owner === req.query.userid){
+          userProjects.push(element)
+        }
+      })
+      res.json({ status: 200, message: 'Successfully Loaded Projects', projectObjects: userProjects})
+
+    })
+    .catch(err => res.json({ status: `Error: ${err}`}))
+});
 
 app.listen(process.env.port || 1337, () => { console.log('listening on port 1337') });
 

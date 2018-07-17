@@ -1,8 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import Login from './Login.js';
-import SignUp from './Signup.js';
+import Login from './Login';
+import SignUp from './Signup';
 
+//This page is the HomePage, if the user has not yet registered or Logged in
 class HomePage extends React.Component {
  constructor(props){
    super(props);

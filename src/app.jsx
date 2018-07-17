@@ -1,8 +1,10 @@
 import React from 'react';
-import Login from './Login'
-import HomePage from './HomePage.js'
-import Doc from './Doc.js'
 import axios from 'axios';
+import HomePage from './Components/HomePage'
+import MainHub from './Components/MainHub'
+
+//This Component Calls The Main Page and Should Determine whether or not a User
+//Is logged in or not and render accordingly.
 
 export default class App extends React.Component {
   constructor(props) {
@@ -41,7 +43,7 @@ export default class App extends React.Component {
     let log = this.state.loggedIn
     // if loggedIn is true, go to Doc.js which is our main page
     return (log ?
-      (<Doc />)
+      (<MainHub />)
       :
       (<HomePage logIn={this.logIn}/>)
     );

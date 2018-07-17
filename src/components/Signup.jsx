@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
-import FormLine from './FormLine.js';
-import Button from './Button.js';
-// import models from './models/models';
-// var User = models.User;
-import Login from './Login.js';
-// var Doc = models.Doc;
+import FormLine from './FormLine';
+import Button from './Button';
+import Login from './Login';
 import axios from 'axios';
 
+
+//This component allows a new user to sign up and takes him directly to the
+//Login Page, where they confirm their login works, and move onto the Main Hub
 
 class Signup extends Component {
   constructor(props) {
