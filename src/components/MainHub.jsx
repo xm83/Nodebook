@@ -49,12 +49,12 @@ class MainHub extends React.Component {
     axios.get(`http://localhost:1337/currentUser`)
     .then((user) => {
       this.setState({
-        currUser: user.data._id
+        currUser: user.data
       })
     })
     axios.get(`http://localhost:1337/loaduserprojects/`, {
       params: {
-        userid: this.state.currUser
+        userid: this.state.currUser._id
       }
     })
     .then((resp) => {
@@ -85,7 +85,7 @@ class MainHub extends React.Component {
     if (this.state.newDoc) {
       axios.post(`http://localhost:1337/savenewdocument`, {
         title: this.state.newDoc,
-        owner: this.state.currUser
+        owner: this.state.currUser._id
       })
       .then((resp) => {
         console.log(resp)
@@ -139,13 +139,12 @@ class MainHub extends React.Component {
   }
 
   render() {
-    console.log(this.state.currUser)
     let docRender;
-    if (this.state.documents) {
-      docRender = this.state.documents.map((doc, i) => <DocCard doc={doc} /> )
+    if (this.state.filteredDocuments) {
+      docRender = this.state.filteredDocuments.map((doc, i) => <DocCard user={this.state.currUser} doc={doc} /> )
     }
     return (this.state.openDoc ?
-      (<Doc id={this.state.openId} goHome={() => this.goHome()} />)
+      (<Doc id={this.state.currUser} goHome={() => this.goHome()} />)
       :
       (
         <div>
