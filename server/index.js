@@ -25,7 +25,7 @@ const MongoStore = require('connect-mongo')(session);
 const LocalStrategy = require('passport-local').Strategy;
 
 app.use(session({
-  secret: 'need to be put into env dot sh later',
+  secret: process.env.SECRET,
   store: new MongoStore({
     mongooseConnection: mongoose.connection,
   }),
@@ -166,28 +166,6 @@ app.post('/removecollaborator', (req, res) => {
     });
 });
 
-// app.get('/loaduserprojects/', (req, res) => {
-//   Project.find()
-//     .exec()
-//     .then((projects) => {
-//       const userProjects = [];
-//       console.log(projects);
-//       console.log(req.query.userid);
-//       projects.forEach((element) => {
-//         element.collaborators.forEach((elementTwo) => {
-//           if (elementTwo === req.query.userid) {
-//             userProjects.push(element);
-//           }
-//         });
-//         if (element.owner === req.query.userid) {
-//           userProjects.push(element);
-//         }
-//       });
-//       res.json({ status: 200, message: 'Successfully Loaded Projects', projectObjects: userProjects });
-//     })
-//     .catch(err => res.json({ status: `Error: ${err}` }));
-// });
-
 app.get('/loaduserprojects/', (req, res) => {
   Project.find({ $or: [
     { collaborators: { $in: [req.user._id] } },
@@ -204,6 +182,9 @@ app.get('/loadproject/:documentid', (req, res) => {
     .catch(err => res.json({ status: `Error: ${err}` }));
 });
 
+app.get('/logout', function(req, res) {
+  req.logout();
+})
 
 
 app.listen(process.env.port || 1337, () => { console.log('listening on port 1337') });

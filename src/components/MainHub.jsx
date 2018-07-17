@@ -144,10 +144,15 @@ class MainHub extends React.Component {
     })
   }
 
+  logOut() {
+    axios.get(`http://localhost:1337/logout`)
+    this.props.logOut()
+  }
+
   render() {
     let docRender;
     if (this.state.filteredDocuments) {
-      docRender = this.state.filteredDocuments.map((doc, i) => <DocCard user={this.state.currUser} doc={doc} openDoc={()=>this.openDoc(doc._id)} /> )
+      docRender = this.state.filteredDocuments.map((doc, i) => <DocCard key={i} user={this.state.currUser} doc={doc} openDoc={()=>this.openDoc(doc._id)} /> )
     }
     return (this.state.openDoc ?
       (<Doc doc={this.state.loadDoc} id={this.state.currUser} goHome={() => this.goHome()} />)
@@ -174,19 +179,9 @@ class MainHub extends React.Component {
                 </form>
               </Modal>
           </div>
-          {/* <ButtonDropdown direction=isOpen={this.state.dropdownOpen} toggle={this.toggle}>
-            <DropdownToggle caret>
-              Sort By
-            </DropdownToggle>
-            <DropdownMenu>
-               <DropdownItem header>Choose One</DropdownItem>
-               <DropdownItem>A to Z</DropdownItem>
-               <DropdownItem divider />
-               <DropdownItem>Z to A</DropdownItem>
-            </DropdownMenu>
-          </ButtonDropdown> */}
           <input type="text" placeholder="Search.." onChange={(e)=> this.filter(e)}/>
           {docRender}
+          <Button type="Logout" onClick={()=>this.logOut()}/>
         </div>
       )
     )
