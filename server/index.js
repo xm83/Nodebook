@@ -110,7 +110,7 @@ app.post('/login', (req, res, next) => {
 app.get('/login', (req, res) => {
   // when this happens, it's due to failure of logging in
   console.log("!!!reqauthInfo", req.authInfo);
-  res.json({status: 400, message: "failure logging in"}); // how to send message from passport authenticate
+  res.json({status: 400, message: "failure logging in"}); 
 })
 
 
