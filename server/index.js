@@ -82,17 +82,8 @@ passport.deserializeUser((userId, done) => {
 });
 
 
-app.post('/login', (req, res, next) => {
-  passport.authenticate('local', (err, user, info) => {
-    if (err) {
-      res.json({ status: 400, err: err });
-    } else if (!user) {
-      res.json({ status: 400, err: info.message });
-    } else {
-      console.log('success');
-      res.redirect('/');
-    }
-  })(req, res, next);
+app.post('/login', passport.authenticate('local'), (req, res) => {
+  res.redirect('/');
 });
 
 app.get('/login', (req, res) => {
@@ -132,7 +123,7 @@ app.get('/', (req, res) => {
 app.post('/savenewdocument', (req, res) => {
   const newProject = new Project({
     title: req.body.title,
-    owner: req.body.owner,
+    owner: req.user._id,
     collaborators: [],
     contents: '',
   });
@@ -190,8 +181,8 @@ app.post('/removecollaborator', (req, res) => {
 
 app.get('/loaduserprojects/', (req, res) => {
   Project.find({ $or: [
-    { collaborators: { $in: [req.query.userId] } },
-    { owner: { $eq: req.query.userId } },
+    { collaborators: { $in: [req.user._id] } },
+    { owner: { $eq: req.user._id } },
   ] })
     .then(userProjects => res.json({ status: 200, message: 'Successfully Loaded Projects', projectObjects: userProjects }))
     .catch(err => res.json({ status: `Error: ${err}` }));
