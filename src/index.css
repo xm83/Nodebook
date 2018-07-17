@@ -1,0 +1,16 @@
+.editor {
+  border: 2px solid black;
+  min-height: 300px;
+  padding: 15px;
+}
+.text-align-left {
+  text-align: left;
+}
+
+.text-align-right {
+  text-align: right;
+}
+
+.text-align-center {
+  text-align: center;
+}
