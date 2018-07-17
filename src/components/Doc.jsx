@@ -18,6 +18,8 @@ const customStyles = {
 
 Modal.setAppElement('#App')
 
+//This document is loaded based on an id, and will load all the information based on that
+
 class Doc extends React.Component {
   constructor(props) {
     super(props);
@@ -45,9 +47,11 @@ class Doc extends React.Component {
 
 
   render(){
+    console.log(this.props.id)
     return (
       <div>
-        <Button type="Home" onClick={()=>this.goHome()}/>
+        <h1> Here: {this.props.id} </h1>
+        <Button type="Home" onClick={()=>this.props.goHome()}/>
         <div>
           <Button type="Share" onClick={this.openModal}/>
           <Modal
