@@ -1,6 +1,7 @@
 import React from 'react';
 import { Editor, EditorState, RichUtils } from 'draft-js';
 import { HuePicker } from 'react-color';
+// import 'draft-js/dist/Draft.css';
 
 
 const styleMap = {
@@ -30,6 +31,13 @@ export default class TextBox extends React.Component {
       fontInput: 0,
     };
     this.onChange = editorState => this.setState({ editorState });
+  }
+  onTab(e) {
+    this.onChange(RichUtils.onTab(
+      e,
+      this.state.editorState,
+      4,
+    ));
   }
   bold() {
     this.onChange(RichUtils.toggleInlineStyle(
@@ -86,14 +94,6 @@ export default class TextBox extends React.Component {
     ));
   }
 
-  onTab(e) {
-    this.onChange(RichUtils.onTab(
-      e,
-      this.state.editorState,
-      4,
-    ));
-  }
-
   render() {
     return (
       <div id="textBox">
@@ -141,6 +141,7 @@ export default class TextBox extends React.Component {
         </div>
         <div className="editor">
           <Editor
+            // spellCheck=true
             onTab={(e) => { this.onTab(e) }}
             customStyleMap={styleMap}
             editorState={this.state.editorState}
