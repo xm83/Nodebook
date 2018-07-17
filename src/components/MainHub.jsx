@@ -39,7 +39,7 @@ class MainHub extends React.Component {
       currUser: ""
     }
 
-    this.toggle = this.toggle.bind(this)
+    this.openDoc= this.openDoc.bind(this)
     this.openModal = this.openModal.bind(this);
     this.afterOpenModal = this.afterOpenModal.bind(this);
     this.closeModal = this.closeModal.bind(this);
@@ -132,16 +132,16 @@ class MainHub extends React.Component {
     })
   }
 
-  toggle() {
+  openDoc() {
     this.setState({
-      dropDownOpen: !this.state.dropdownOpen
+      openDoc: !this.state.openDoc
     })
   }
 
   render() {
     let docRender;
     if (this.state.filteredDocuments) {
-      docRender = this.state.filteredDocuments.map((doc, i) => <DocCard user={this.state.currUser} doc={doc} /> )
+      docRender = this.state.filteredDocuments.map((doc, i) => <DocCard user={this.state.currUser} doc={doc} openDoc={(i)=>this.openDoc(i)} /> )
     }
     return (this.state.openDoc ?
       (<Doc id={this.state.currUser} goHome={() => this.goHome()} />)
