@@ -57,11 +57,19 @@
     "axios": "^0.18.0",
     "babel-plugin-transform-class-properties": "^6.24.1",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "body-parser": "^1.18.3",
+    "connect-mongo": "^2.0.1",
+    "crypto": "^1.0.1",
     "draft-js": "^0.10.5",
     "electron-compile": "^6.4.3",
     "electron-devtools-installer": "^2.2.4",
     "electron-squirrel-startup": "^1.0.0",
+    "express": "^4.16.3",
+    "express-session": "^1.15.6",
     "mongoose": "^5.2.4",
+    "passport": "^0.4.0",
+    "passport-local": "^1.0.0",
+    "path": "^0.12.7",
     "react": "^15.6.2",
     "react-color": "^2.14.1",
     "react-dom": "^15.6.2",
@@ -86,5 +94,4 @@
     "eslint-plugin-react": "^7.10.0",
     "nodemon": "^1.18.2"
   }
-  
 }

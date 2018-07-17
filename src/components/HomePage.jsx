@@ -16,7 +16,7 @@ class HomePage extends React.Component {
  toggleReg = () => {
    this.setState({
      register: !this.state.register,
-   })
+   }) 
  }
 
  render(){
