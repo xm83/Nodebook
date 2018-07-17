@@ -4,14 +4,20 @@ import { HuePicker } from 'react-color';
 
 
 const styleMap = {
-  right: {
-    textAlign: 'right',
+  left: {
+    textDecoration: {
+      textAlign: 'center',
+    },
   },
   center: {
-    textAlign: 'center',
+    textDecoration: {
+      textAlign: 'center',
+    },
   },
-  left: {
-    textAlign: 'left',
+  right: {
+    textDecoration: {
+      textAlign: 'right',
+    },
   },
 };
 
@@ -22,7 +28,6 @@ export default class TextBox extends React.Component {
       editorState: EditorState.createEmpty(),
       color: '#fff',
       fontInput: 0,
-      align: 'left',
     };
     this.onChange = editorState => this.setState({ editorState });
   }
@@ -74,14 +79,38 @@ export default class TextBox extends React.Component {
     ));
   }
 
+  block(block) {
+    this.onChange(RichUtils.toggleBlockType(
+      this.state.editorState,
+      block,
+    ));
+  }
+
+  onTab(e) {
+    this.onChange(RichUtils.onTab(
+      e,
+      this.state.editorState,
+      4,
+    ));
+  }
+
   render() {
     return (
       <div id="textBox">
         <div id="textOptions">
+          <button onClick={() => { this.block('header-one'); }}>h1</button>
+          <button onClick={() => { this.block('header-two'); }}>h2</button>
+          <button onClick={() => { this.block('header-three'); }}>h3</button>
+          <button onClick={() => { this.block('header-four'); }}>h4</button>
+          <button onClick={() => { this.block('header-five'); }}>h5</button>
+          <button onClick={() => { this.block('header-six'); }}>h6</button>
+          <button onClick={() => { this.block('blockquote'); }}>Blockquote</button>
+          <button onClick={() => { this.block('unstyled'); }}>Clear Block Styling</button><br />
+
           <button onClick={() => { this.bold(); }}><b>B</b></button>
           <button onClick={() => { this.italicize(); }}><i>I</i></button>
           <button onClick={() => { this.underline(); }}><u>U</u></button>
-          <button onClick={() => { this.code(); }}>Code</button><br />
+          <button onClick={() => { this.code(); this.block('code-block'); }}>Code</button><br />
           <input
             onKeyPress={(e) => {
               if (e.key === 'Enter') {
@@ -106,14 +135,13 @@ export default class TextBox extends React.Component {
           />
           <button onClick={() => { this.align('left'); }}>Left</button>
           <button onClick={() => { this.align('center'); }}>Center</button>
-          <button onClick={() => { this.align('right'); }}>Right</button><br/>
-          <button onClick={() => { this.setState({ align: 'left' }); }}> All Left </button>
-          <button onClick={() => { this.setState({ align: 'center' }); }}> All Center </button>
-          <button onClick={() => { this.setState({ align: 'right' }); }}> All Right </button>
+          <button onClick={() => { this.align('right'); }}>Right</button><br />
+          <button onClick={() => { this.block('ordered-list-item'); }}>Numbered List</button>
+          <button onClick={() => { this.block('unordered-list-item'); }}>Bullet Points</button>
         </div>
         <div className="editor">
           <Editor
-            textAlignment={this.state.align}
+            onTab={(e) => { this.onTab(e) }}
             customStyleMap={styleMap}
             editorState={this.state.editorState}
             onChange={this.onChange}
