@@ -11,7 +11,8 @@ class LoginBlock extends React.Component {
    super(props);
    this.state = {
      email: '',
-     pword: ''
+     pword: '',
+     msg: ''
    }
  }
 
@@ -24,13 +25,15 @@ class LoginBlock extends React.Component {
     })
     .then(resp => {
       if (resp.data.status === 200) {
-        console.log("success logging in,", resp);
+        console.log("success logging in,", resp.data);
         this.clear();
         // go to Doc page
         this.props.logIn();
       } else {
-        // TODO get back error message?
-        console.log("error logging in", resp);
+        console.log("error logging in", resp.data.err);
+        this.setState({
+          msg: resp.data.err
+        })
       }
     })
     .catch((err) => {
@@ -51,6 +54,7 @@ class LoginBlock extends React.Component {
         <div className="text-right" style={{paddingRight: '10px'}}><Button type = "Register" onClick={()=>this.props.toggleReg()}/></div>
         <form className = "well">
           <h3 className = "title"> Login </h3>
+          <h2>{this.state.msg}</h2>
           <FormLine name = "Email" type = "text" value = {this.state.email} onChange={(e)=> this.setState({
             email: e.target.value
           })}/>
