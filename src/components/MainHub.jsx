@@ -141,8 +141,8 @@ class MainHub extends React.Component {
   render() {
     console.log(this.state.currUser)
     let docRender;
-    if (this.state.filteredDocuments) {
-      docRender = this.state.filteredDocuments.map((doc, i) => <DocCard doc={doc} /> )
+    if (this.state.documents) {
+      docRender = this.state.documents.map((doc, i) => <DocCard doc={doc} /> )
     }
     return (this.state.openDoc ?
       (<Doc id={this.state.openId} goHome={() => this.goHome()} />)
