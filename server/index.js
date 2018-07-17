@@ -8,27 +8,15 @@ const app = express();
 
 const mongoose = require('mongoose');
 
+const User = require('./models').User;
+
+const Project = require('./models').Project;
+
 mongoose.connect(process.env.MONGODB_URI);
-
-// Models, these can be moved to their own folder later if desired
-const User = mongoose.model('User', {
-  firstName: String,
-  lastName: String,
-  email: String,
-  password: String,
-});
-
-const Project = mongoose.model('Project', {
-  title: String,
-  owner: String,
-  collaborators: Array,
-  contents: String,
-});
 
 
 app.use(express.static(path.join(__dirname, 'build')));
 app.use(bodyParser.json());
-
 
 
 const passport = require('passport');
@@ -101,9 +89,9 @@ app.get('/currentUser', (req, res)  => {
   }
 })
 
-app.post('/login', passport.authenticate('local'), function(req, res) {
-  res.redirect('/')
-})
+app.post('/login', passport.authenticate('local'), (req, res) => {
+  res.redirect('/');
+});
 
 app.get('/login', (req, res) => {
   // when this happens, it's due to failure of logging in
@@ -144,7 +132,7 @@ app.get('/', (req, res) => {
 app.post('/savenewdocument', (req, res) => {
   const newProject = new Project({
     title: req.body.title,
-    owner: req.body.owner,
+    owner: req.user._id,
     collaborators: [],
     contents: '',
   });
@@ -178,28 +166,34 @@ app.post('/removecollaborator', (req, res) => {
     });
 });
 
+// app.get('/loaduserprojects/', (req, res) => {
+//   Project.find()
+//     .exec()
+//     .then((projects) => {
+//       const userProjects = [];
+//       console.log(projects);
+//       console.log(req.query.userid);
+//       projects.forEach((element) => {
+//         element.collaborators.forEach((elementTwo) => {
+//           if (elementTwo === req.query.userid) {
+//             userProjects.push(element);
+//           }
+//         });
+//         if (element.owner === req.query.userid) {
+//           userProjects.push(element);
+//         }
+//       });
+//       res.json({ status: 200, message: 'Successfully Loaded Projects', projectObjects: userProjects });
+//     })
+//     .catch(err => res.json({ status: `Error: ${err}` }));
+// });
+
 app.get('/loaduserprojects/', (req, res) => {
-  Project.find()
-    .exec()
-    .then((projects) => {
-      const userProjects = [];
-      console.log(projects)
-      console.log(req.user._id);
-      projects.forEach((element) => {
-        element.collaborators.forEach((elementTwo) => {
-          if (elementTwo === req.user.userid) {
-            userProjects.push(element);
-          }
-        });
-        console.log(element.owner)
-        if (element.owner === req.user._id) {
-          console.log('backend', req.user._id)
-          userProjects.push(element);
-          console.log(userProjects)
-        }
-      });
-      res.json({ status: 200, message: 'Successfully Loaded Projects', projectObjects: userProjects });
-    })
+  Project.find({ $or: [
+    { collaborators: { $in: [req.user._id] } },
+    { owner: { $eq: req.user._id } },
+  ] })
+    .then(userProjects => res.json({ status: 200, message: 'Successfully Loaded Projects', projectObjects: userProjects }))
     .catch(err => res.json({ status: `Error: ${err}` }));
 });
 

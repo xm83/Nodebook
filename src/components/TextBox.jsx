@@ -4,23 +4,28 @@ import { HuePicker } from 'react-color';
 // import 'draft-js/dist/Draft.css';
 
 
-const styleMap = {
-  left: {
-    textDecoration: {
-      textAlign: 'center',
-    },
-  },
-  center: {
-    textDecoration: {
-      textAlign: 'center',
-    },
-  },
-  right: {
-    textDecoration: {
-      textAlign: 'right',
-    },
-  },
-};
+const styleMap = {};
+const blockStyles = [
+  { style: 'header-one', title: 'H1' },
+  { style: 'header-two', title: 'H2' },
+  { style: 'header-three', title: 'H3' },
+  { style: 'header-four', title: 'H4' },
+  { style: 'header-five', title: 'H5' },
+  { style: 'header-six', title: 'H6' },
+  { style: 'blockquote', title: 'Quote' },
+  { style: 'unstyled', title: 'Clear Block Style' },
+  { style: 'text-align-left', title: 'Left' },
+  { style: 'text-align-center', title: 'Center' },
+  { style: 'text-align-right', title: 'Right' },
+  { style: 'ordered-list-item', title: 'Numbered List' },
+  { style: 'unordered-list-item', title: 'Bullet Points' },
+
+];
+
+function getBlockStyle(block) {
+  const type = block.getType();
+  return (type.indexOf('text-align-') === 0) ? type : null;
+}
 
 export default class TextBox extends React.Component {
   constructor(props) {
@@ -32,58 +37,12 @@ export default class TextBox extends React.Component {
     };
     this.onChange = editorState => this.setState({ editorState });
   }
-  onTab(e) {
-    this.onChange(RichUtils.onTab(
-      e,
-      this.state.editorState,
-      4,
-    ));
-  }
-  bold() {
-    this.onChange(RichUtils.toggleInlineStyle(
-      this.state.editorState,
-      'BOLD',
-    ));
-  }
-  italicize() {
-    this.onChange(RichUtils.toggleInlineStyle(
-      this.state.editorState,
-      'ITALIC',
-    ));
-  }
-  underline() {
-    this.onChange(RichUtils.toggleInlineStyle(
-      this.state.editorState,
-      'UNDERLINE',
-    ));
-  }
-  code() {
-    this.onChange(RichUtils.toggleInlineStyle(
-      this.state.editorState,
-      'CODE',
-    ));
-  }
 
 
-  toggleColor(toggledColor) {
+  inline(inline) {
     this.onChange(RichUtils.toggleInlineStyle(
       this.state.editorState,
-      toggledColor,
-    ));
-  }
-
-  font(fontSize) {
-    this.onChange(RichUtils.toggleInlineStyle(
-      this.state.editorState,
-      fontSize,
-    ));
-  }
-
-  align(side) {
-    console.log(styleMap[side]);
-    this.onChange(RichUtils.toggleInlineStyle(
-      this.state.editorState,
-      side,
+      inline,
     ));
   }
 
@@ -93,29 +52,25 @@ export default class TextBox extends React.Component {
       block,
     ));
   }
-
   render() {
     return (
       <div id="textBox">
         <div id="textOptions">
-          <button onClick={() => { this.block('header-one'); }}>h1</button>
-          <button onClick={() => { this.block('header-two'); }}>h2</button>
-          <button onClick={() => { this.block('header-three'); }}>h3</button>
-          <button onClick={() => { this.block('header-four'); }}>h4</button>
-          <button onClick={() => { this.block('header-five'); }}>h5</button>
-          <button onClick={() => { this.block('header-six'); }}>h6</button>
-          <button onClick={() => { this.block('blockquote'); }}>Blockquote</button>
-          <button onClick={() => { this.block('unstyled'); }}>Clear Block Styling</button><br />
-
-          <button onClick={() => { this.bold(); }}><b>B</b></button>
-          <button onClick={() => { this.italicize(); }}><i>I</i></button>
-          <button onClick={() => { this.underline(); }}><u>U</u></button>
-          <button onClick={() => { this.code(); this.block('code-block'); }}>Code</button><br />
+          {blockStyles.map(({ style, title }) =>
+          (<button onClick={() => { this.block(style); }}>{title}</button>))}
+          <br />
+          <button onClick={() => { this.inline('BOLD'); }}><b>B</b></button>
+          <button onClick={() => { this.inline('ITALIC'); }}><i>I</i></button>
+          <button onClick={() => { this.inline('UNDERLINE'); }}><u>U</u></button>
+          <button onClick={() => {
+            this.inline('CODE'); this.block('code-block');
+          }}
+          >Code</button>
           <input
             onKeyPress={(e) => {
               if (e.key === 'Enter') {
                 styleMap[String(e.target.value)] = { fontSize: e.target.value };
-                this.font(String(e.target.value));
+                this.inline(String(e.target.value));
               }
             }
                   }
@@ -130,19 +85,13 @@ export default class TextBox extends React.Component {
             onChangeComplete={(color) => {
               styleMap[String(color.hex)] = { color: color.hex };
               this.setState({ color: color.hex });
-              this.toggleColor(String(color.hex));
+              this.inline(String(color.hex));
             }}
           />
-          <button onClick={() => { this.align('left'); }}>Left</button>
-          <button onClick={() => { this.align('center'); }}>Center</button>
-          <button onClick={() => { this.align('right'); }}>Right</button><br />
-          <button onClick={() => { this.block('ordered-list-item'); }}>Numbered List</button>
-          <button onClick={() => { this.block('unordered-list-item'); }}>Bullet Points</button>
         </div>
         <div className="editor">
           <Editor
-            // spellCheck=true
-            onTab={(e) => { this.onTab(e) }}
+            blockStyleFn={getBlockStyle}
             customStyleMap={styleMap}
             editorState={this.state.editorState}
             onChange={this.onChange}
