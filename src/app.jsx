@@ -37,15 +37,21 @@ export default class App extends React.Component {
     this.setState({
       loggedIn: true
     })
-  } 
+  }
+
+  logOut = () => {
+    this.setState({
+      loggedIn: false
+    })
+  }
 
   render() {
     let log = this.state.loggedIn
     // if loggedIn is true, go to Doc.js which is our main page
     return (log ?
-      (<MainHub />)
+      (<MainHub logOut={this.logOut}/>)
       :
-      (<HomePage logIn={this.logIn}/>)
+      (<HomePage logIn={this.logIn} />)
     );
   }
 }
