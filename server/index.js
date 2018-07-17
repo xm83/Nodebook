@@ -79,11 +79,11 @@ passport.use(new LocalStrategy((email, password, done) => {
 }));
 
 passport.serializeUser((user, done) => {
-  console.log('serialize user:', user);
+  //console.log('serialize user:', user);
   done(null, user._id); // does this need the '_', could it just be .id?
 });
 passport.deserializeUser((userId, done) => {
-  console.log('deserialize id:', userId);
+  //console.log('deserialize id:', userId);
   User.findById(userId, (err, user) => {
     if (err) {
       done(err);
@@ -93,19 +93,17 @@ passport.deserializeUser((userId, done) => {
   });
 });
 
+app.get('/currentUser', (req, res)  => {
+  if (!req.user) {
+    console.log('error')
+  } else {
+    res.send(req.user)
+  }
+})
 
-app.post('/login', (req, res, next) => {
-  passport.authenticate('local', (err, user, info) => {
-    if (err) {
-      res.json({ status: 400, err: err });
-    } else if (!user) {
-      res.json({ status: 400, err: info.message });
-    } else {
-      console.log('success');
-      res.redirect('/');
-    }
-  })(req, res, next);
-});
+app.post('/login', passport.authenticate('local'), function(req, res) {
+  res.redirect('/')
+})
 
 app.get('/login', (req, res) => {
   // when this happens, it's due to failure of logging in
@@ -130,6 +128,8 @@ app.post('/register', (req, res) => {
 // universal route that checks if a user is logged in or not
 // from this point on, user would be logged in; i.e. req.user will be an obj instead of null
 app.use('/*', (req, res, next) => {
+  // console.log("wild card req.body", req.body);
+  // console.log("wild card req.body.user", req.body.user);
   if (!req.user) {
     res.json({ status: 400, message: 'user not logged in' });
   } else {
@@ -183,22 +183,26 @@ app.get('/loaduserprojects/', (req, res) => {
     .exec()
     .then((projects) => {
       const userProjects = [];
-      console.log(projects);
-      console.log(req.query.userid);
+      console.log(projects)
+      console.log(req.user._id);
       projects.forEach((element) => {
         element.collaborators.forEach((elementTwo) => {
-          if (elementTwo === req.query.userid) {
+          if (elementTwo === req.user.userid) {
             userProjects.push(element);
           }
         });
-        if (element.owner === req.query.userid) {
+        console.log(element.owner)
+        if (element.owner === req.user._id) {
+          console.log('backend', req.user._id)
           userProjects.push(element);
+          console.log(userProjects)
         }
       });
       res.json({ status: 200, message: 'Successfully Loaded Projects', projectObjects: userProjects });
     })
     .catch(err => res.json({ status: `Error: ${err}` }));
 });
+
 
 app.listen(process.env.port || 1337, () => { console.log('listening on port 1337') });
 

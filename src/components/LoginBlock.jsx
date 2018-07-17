@@ -24,7 +24,7 @@ class LoginBlock extends React.Component {
       password: this.state.pword,
     })
     .then(resp => {
-      if (resp.data.status === 200) {
+      if (resp.status === 200) {
         console.log("success logging in,", resp.data);
         this.clear();
         // go to Doc page

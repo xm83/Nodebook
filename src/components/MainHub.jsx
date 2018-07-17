@@ -35,7 +35,8 @@ class MainHub extends React.Component {
       documents: [],
       search: "",
       filteredDocuments: [],
-      dropdownOpen: false
+      dropdownOpen: false,
+      currUser: ""
     }
 
     this.toggle = this.toggle.bind(this)
@@ -45,9 +46,15 @@ class MainHub extends React.Component {
   }
 
   componentDidMount() {
+    axios.get(`http://localhost:1337/currentUser`)
+    .then((user) => {
+      this.setState({
+        currUser: user.data._id
+      })
+    })
     axios.get(`http://localhost:1337/loaduserprojects/`, {
       params: {
-        userid: "Krish"
+        userid: this.state.currUser
       }
     })
     .then((resp) => {
@@ -78,7 +85,7 @@ class MainHub extends React.Component {
     if (this.state.newDoc) {
       axios.post(`http://localhost:1337/savenewdocument`, {
         title: this.state.newDoc,
-        owner: "Krish"
+        owner: this.state.currUser
       })
       .then((resp) => {
         console.log(resp)
@@ -96,13 +103,9 @@ class MainHub extends React.Component {
   }
 
   goHome = () => {
-    axios.get(`http://localhost:1337/loaduserprojects/`, {
-      params: {
-        userid: "Krish"
-      }
-    })
+    axios.get(`http://localhost:1337/loaduserprojects/`)
     .then((resp) => {
-      console.log(resp.data)
+      console.log('frontend', resp.data)
       this.setState({
         documents: resp.data.projectObjects,
         openDoc: false,
@@ -136,6 +139,11 @@ class MainHub extends React.Component {
   }
 
   render() {
+    console.log(this.state.currUser)
+    let docRender;
+    if (this.state.filteredDocuments) {
+      docRender = this.state.filteredDocuments.map((doc, i) => <DocCard doc={doc} /> )
+    }
     return (this.state.openDoc ?
       (<Doc id={this.state.openId} goHome={() => this.goHome()} />)
       :
@@ -161,7 +169,7 @@ class MainHub extends React.Component {
                 </form>
               </Modal>
           </div>
-          {/* <ButtonDropdown direction='down' isOpen={this.state.dropdownOpen} toggle={this.toggle}>
+          {/* <ButtonDropdown direction=isOpen={this.state.dropdownOpen} toggle={this.toggle}>
             <DropdownToggle caret>
               Sort By
             </DropdownToggle>
@@ -173,7 +181,7 @@ class MainHub extends React.Component {
             </DropdownMenu>
           </ButtonDropdown> */}
           <input type="text" placeholder="Search.." onChange={(e)=> this.filter(e)}/>
-          {this.state.filteredDocuments.map((doc, i) => <DocCard doc={doc} /> )}
+          {docRender}
         </div>
       )
     )
