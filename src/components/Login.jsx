@@ -1,9 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import LoginBlock from './LoginBlock.js'
+import LoginBlock from './LoginBlock'
 
 const dbUrl = "http://localhost:3000/db";
 
+//This component brings the user to a form that allows him to log in
 class Login extends React.Component {
   constructor(props){
     super(props);
@@ -18,6 +19,7 @@ class Login extends React.Component {
              </h4>
              <LoginBlock toggleReg={this.props.toggleReg} logIn={this.props.logIn}/></center>
            </div>);
+  }
 
 }
 

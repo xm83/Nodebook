@@ -4,6 +4,7 @@ import Button from './Button';
 import FormLine from './FormLine';
 
 
+//This component is the actual form itself.
 class LoginBlock extends React.Component {
  constructor(props){
    super(props);

@@ -64,6 +64,7 @@ app.post('/savenewdocument', (req, res) => {
     .catch(err => res.json({ status: `Error: ${err}` }));
 });
 
+//Might Have to Move the .then and .catch
 app.post('/savenewcollaborator', (req, res) => {
   Project.findById(req.body.projectId)
     .then((project) => {
@@ -75,8 +76,10 @@ app.post('/savenewcollaborator', (req, res) => {
     });
 });
 
+//Might Have to Move the .then and .catch
 app.post('/removecollaborator', (req, res) => {
   Project.findById(req.body.projectId)
+    .exec()
     .then((project) => {
       const newCollaboratorArr = project.collaborators;
       newCollaboratorArr.splice(newCollaboratorArr.indexOf(req.body.collaboratorToBeRemoved), 1);
@@ -86,20 +89,27 @@ app.post('/removecollaborator', (req, res) => {
     });
 });
 
-app.get('/loaduserprojects/:userid', (req, res) => {
+app.get('/loaduserprojects/', (req, res) => {
   Project.find()
+    .exec()
     .then((projects) => {
       const userProjects = [];
+      console.log(projects)
+      console.log(req.query.userid)
       projects.forEach((element) => {
         element.collaborators.forEach((elementTwo) => {
-          if (elementTwo === req.params.userid) {
+          if (elementTwo === req.query.userid) {
             userProjects.push(element);
           }
         });
+        if(element.owner === req.query.userid){
+          userProjects.push(element)
+        }
       })
-      .then(res.json({ status: 200, message: 'Successfully Loaded Projects', projectObjects: userProjects }))
-      .catch(err => res.json({ status: `Error: ${err}` }));
-    });
+      res.json({ status: 200, message: 'Successfully Loaded Projects', projectObjects: userProjects})
+
+    })
+    .catch(err => res.json({ status: `Error: ${err}`}))
 });
 
 app.listen(process.env.port || 1337, () => { console.log('listening on port 1337') });
