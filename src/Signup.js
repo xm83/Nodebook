@@ -5,6 +5,7 @@ import Button from './Button.js';
 // var User = models.User;
 import Login from './Login.js';
 // var Doc = models.Doc;
+import axios from 'axios';
 
 
 class Signup extends Component {
@@ -15,7 +16,8 @@ class Signup extends Component {
       lastName: "",
       email: "",
       pword: "",
-      confirmPword: ""
+      confirmPword: "",
+      msg:''
     }
   }
 
@@ -26,29 +28,32 @@ class Signup extends Component {
         this.state.pword &&
         this.state.confirmPword) {
       if (this.state.pword === this.state.confirmPword) {
-        fetch(`${global.NGROK}/register`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            firstName: this.state.firstName,
-            lastName: this.state.lastName,
-            email: this.state.email,
-            password: this.state.pword,
-          }),
+        axios.post('http://localhost:1337/register', {
+          firstName: this.state.firstName,
+          lastName: this.state.lastName,
+          email: this.state.email,
+          password: this.state.pword,
         })
         .then((resp) => {
-          if (resp.status === 200) {
-            // Put the command to redirect to login here
+          if (resp.data.status === 200) {
+            // redirect to login
+            this.props.toggleReg();
           } else {
-            console.log('error!');
+            console.log('error!,', resp);
           }
         })
         .catch((err) => {
           console.log('Error: ', err);
         });
+      } else {
+        this.setState({
+          msg: 'passwords must match'
+        })
       }
+    } else {
+      this.setState({
+        msg: 'fill in everything'
+      })
     }
   }
 
@@ -57,6 +62,7 @@ class Signup extends Component {
     return (
       <form className="well">
         <h3 className="title"> Sign up </h3>
+        <h2>{this.state.msg}</h2>
         <FormLine name = "FirstName" type = "text" value = {this.state.firstName} onChange={(e)=> this.setState({
           firstName: e.target.value
         })}/>

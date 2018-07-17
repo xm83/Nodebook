@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import Button from './Button';
 import FormLine from './FormLine';
+import axios from 'axios'
 
 
 class LoginBlock extends React.Component {
@@ -14,10 +15,26 @@ class LoginBlock extends React.Component {
  }
 
   login(){
-    console.log(this.state);
-    //ADD PASSPORT HERE!
-    this.clear();
-    this.props.logIn()
+    console.log("LoginBlock's state:", this.state);
+    // log user in
+    axios.post('http://localhost:1337/login', {
+      username: this.state.email,
+      password: this.state.pword,
+    })
+    .then(resp => {
+      if (resp.data.status === 200) {
+        console.log("success logging in,", resp);
+        this.clear();
+        // go to Doc page
+        this.props.logIn();
+      } else {
+        // TODO get back error message?
+        console.log("error logging in", resp);
+      }
+    })
+    .catch((err) => {
+      console.log('Error: ', err);
+    });
   }
 
   clear (){
@@ -39,7 +56,7 @@ class LoginBlock extends React.Component {
           <FormLine name = "Password" type = "password" value = {this.state.pword} onChange={(e)=> this.setState({
             pword: e.target.value
           })}/>
-          <Button type = "Login" onClick={()=>this.logIn()}/>
+          <Button type = "Login" onClick={()=>this.login()}/>
         </form>
       </div>
     );

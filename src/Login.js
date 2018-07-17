@@ -4,13 +4,9 @@ import LoginBlock from './LoginBlock.js'
 
 const dbUrl = "http://localhost:3000/db";
 
-class Login extends React.Component {
-  constructor(props){
-    super(props);
-  }
-
- render() {
-   return (<div id= "login"><center>
+export default class Login extends React.Component {
+  render() {
+    return (<div id= "login"><center>
              <h2>Welcome</h2>
                <br/>
              <h4>
@@ -18,7 +14,5 @@ class Login extends React.Component {
              </h4>
              <LoginBlock toggleReg={this.props.toggleReg} logIn={this.props.logIn}/></center>
            </div>);
-
+ }
 }
-
-export default Login;
