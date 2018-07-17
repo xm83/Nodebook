@@ -95,15 +95,22 @@ passport.deserializeUser((userId, done) => {
 });
 
 
-app.post('/login', passport.authenticate('local', {
-  successRedirect: '/',
-  failureRedirect: '/login'
-}))
+app.post('/login', (req, res, next) => {
+  passport.authenticate('local',(err, user, info) => {
+    if (err) {res.json({status: 400, err: err})} 
+    else if (!user) {res.json({status: 400, err: info.message})}
+    else {
+      console.log("success");
+      res.redirect('/');
+
+    }
+  })(req, res, next);
+})
 
 app.get('/login', (req, res) => {
   // when this happens, it's due to failure of logging in
   console.log("!!!reqauthInfo", req.authInfo);
-  res.json({status: 400, message: "failure logging in"}); // how to send message from passport authenticate
+  res.json({status: 400, message: "failure logging in"}); 
 })
 
 
