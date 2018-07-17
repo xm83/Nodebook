@@ -44,13 +44,11 @@ class Doc extends React.Component {
     this.setState({modalIsOpen: false});
   }
 
-
-
   render(){
     console.log(this.props)
     return (
       <div>
-        <h1> Here: {this.props.id.firstName} </h1>
+        <h1> {this.props.doc.title} </h1>
         <Button type="Home" onClick={()=>this.props.goHome()}/>
         <div>
           <Button type="Share" onClick={this.openModal}/>
@@ -62,13 +60,13 @@ class Doc extends React.Component {
             contentLabel="Share Your Document"
           >
             <h2 ref={subtitle => this.subtitle = subtitle}> Share Your Document </h2>
-            <Button type="Return" onClick={this.closeModal}/>
               <form className = "well">
                 <h3 className = "title"> Users To Share With </h3>
                 <FormLine name = "Email" type = "text" value = {this.state.email} onChange={(e)=> this.setState({
                   email: e.target.value
                 })}/>
                 <Button type = "Share" onClick={()=>this.share()}/>
+                <Button type="Cancel" onClick={this.closeModal}/>
               </form>
             </Modal>
         </div>

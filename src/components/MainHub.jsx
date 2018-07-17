@@ -31,12 +31,11 @@ class MainHub extends React.Component {
       modalIsOpen: false,
       newDoc: "",
       openDoc: false,
-      openId: "",
       documents: [],
       search: "",
       filteredDocuments: [],
-      dropdownOpen: false,
-      currUser: ""
+      currUser: "",
+      loadDoc: ""
     }
 
     this.openDoc= this.openDoc.bind(this)
@@ -88,11 +87,10 @@ class MainHub extends React.Component {
         owner: this.state.currUser._id
       })
       .then((resp) => {
-        console.log(resp)
         if (resp.status === 200) {
           this.setState({
             openDoc: true,
-            openId: resp.data.id
+            loadDoc: resp.data.projectObject
           })
         }
       })
@@ -132,19 +130,27 @@ class MainHub extends React.Component {
     })
   }
 
-  openDoc() {
-    this.setState({
-      openDoc: !this.state.openDoc
+  openDoc(docId) {
+    axios.get(`http://localhost:1337/loadproject/` + docId)
+    .then((proj) => {
+      console.log(proj.data)
+      this.setState({
+        openDoc: !this.state.openDoc,
+        loadDoc: proj.data.projectObject
+      })
+    })
+    .catch((err) => {
+      console.log(err)
     })
   }
 
   render() {
     let docRender;
     if (this.state.filteredDocuments) {
-      docRender = this.state.filteredDocuments.map((doc, i) => <DocCard user={this.state.currUser} doc={doc} openDoc={(i)=>this.openDoc(i)} /> )
+      docRender = this.state.filteredDocuments.map((doc, i) => <DocCard user={this.state.currUser} doc={doc} openDoc={()=>this.openDoc(doc._id)} /> )
     }
     return (this.state.openDoc ?
-      (<Doc id={this.state.currUser} goHome={() => this.goHome()} />)
+      (<Doc doc={this.state.loadDoc} id={this.state.currUser} goHome={() => this.goHome()} />)
       :
       (
         <div>
