@@ -8,27 +8,15 @@ const app = express();
 
 const mongoose = require('mongoose');
 
+const User = require('./models').User;
+
+const Project = require('./models').Project;
+
 mongoose.connect(process.env.MONGODB_URI);
-
-// Models, these can be moved to their own folder later if desired
-const User = mongoose.model('User', {
-  firstName: String,
-  lastName: String,
-  email: String,
-  password: String,
-});
-
-const Project = mongoose.model('Project', {
-  title: String,
-  owner: String,
-  collaborators: Array,
-  contents: String,
-});
 
 
 app.use(express.static(path.join(__dirname, 'build')));
 app.use(bodyParser.json());
-
 
 
 const passport = require('passport');
@@ -178,25 +166,34 @@ app.post('/removecollaborator', (req, res) => {
     });
 });
 
+// app.get('/loaduserprojects/', (req, res) => {
+//   Project.find()
+//     .exec()
+//     .then((projects) => {
+//       const userProjects = [];
+//       console.log(projects);
+//       console.log(req.query.userid);
+//       projects.forEach((element) => {
+//         element.collaborators.forEach((elementTwo) => {
+//           if (elementTwo === req.query.userid) {
+//             userProjects.push(element);
+//           }
+//         });
+//         if (element.owner === req.query.userid) {
+//           userProjects.push(element);
+//         }
+//       });
+//       res.json({ status: 200, message: 'Successfully Loaded Projects', projectObjects: userProjects });
+//     })
+//     .catch(err => res.json({ status: `Error: ${err}` }));
+// });
+
 app.get('/loaduserprojects/', (req, res) => {
-  Project.find()
-    .exec()
-    .then((projects) => {
-      const userProjects = [];
-      console.log(projects);
-      console.log(req.query.userid);
-      projects.forEach((element) => {
-        element.collaborators.forEach((elementTwo) => {
-          if (elementTwo === req.query.userid) {
-            userProjects.push(element);
-          }
-        });
-        if (element.owner === req.query.userid) {
-          userProjects.push(element);
-        }
-      });
-      res.json({ status: 200, message: 'Successfully Loaded Projects', projectObjects: userProjects });
-    })
+  Project.find({ $or: [
+    { collaborators: { $in: [req.query.userId] } },
+    { owner: { $eq: req.query.userId } },
+  ] })
+    .then(userProjects => res.json({ status: 200, message: 'Successfully Loaded Projects', projectObjects: userProjects }))
     .catch(err => res.json({ status: `Error: ${err}` }));
 });
 
