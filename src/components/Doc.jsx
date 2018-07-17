@@ -4,6 +4,7 @@ import Modal from 'react-modal';
 import Button from './Button';
 import FormLine from './FormLine';
 import TextBox from './TextBox';
+import axios from 'axios'
 
 const customStyles = {
   content : {
@@ -24,7 +25,9 @@ class Doc extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      modalIsOpen: false
+      modalIsOpen: false,
+      shareUserId: "",
+      email: ""
     }
 
     this.openModal = this.openModal.bind(this);
@@ -44,8 +47,33 @@ class Doc extends React.Component {
     this.setState({modalIsOpen: false});
   }
 
+  share = () => {
+    axios.get(`http://localhost:1337/findUser/` + this.state.email)
+    .then((user) => {
+      this.setState({
+        shareUserId: user.data.shareUser._id
+      })
+      console.log(user.data.shareUser._id)
+      axios.post(`http://localhost:1337/savenewcollaborator`, {
+        newCollaborator: this.state.shareUserId,
+        projectId: this.props.doc._id
+      })
+      .then((resp) => {
+        if (resp.status === 200) {
+          this.setState({
+            shareUserId: "",
+          })
+        }
+        console.log(resp)
+        this.closeModal()
+      })
+    })
+    .catch((err) => {
+      console.log('Error: ', err);
+    })
+  }
+
   render(){
-    console.log(this.props)
     return (
       <div>
         <h1> {this.props.doc.title} </h1>
@@ -65,7 +93,7 @@ class Doc extends React.Component {
                 <FormLine name = "Email" type = "text" value = {this.state.email} onChange={(e)=> this.setState({
                   email: e.target.value
                 })}/>
-                <Button type = "Share" onClick={()=>this.share()}/>
+                <Button type = "Share" onClick={this.share}/>
                 <Button type="Cancel" onClick={this.closeModal}/>
               </form>
             </Modal>

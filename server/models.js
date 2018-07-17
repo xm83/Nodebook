@@ -15,9 +15,19 @@ const userSchema = Schema({
 });
 
 const projectSchema = Schema({
-  title: String,
-  owner: { type: Schema.Types.ObjectId, ref: 'User' },
-  collaborators: [{ type: Schema.Types.ObjectId, ref: 'Person' }],
+  title: {
+    type: String,
+    default: 'Untitled'
+  },
+  owner: {
+    type: Schema.Types.ObjectId,
+    required: true,
+    ref: 'User'
+  },
+  collaborators: {
+    type: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+    default: []
+  },
   contents: String,
 });
 
