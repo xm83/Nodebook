@@ -41,14 +41,14 @@ app.post('/register', (req, res) => {
     email: req.body.email,
     password: req.body.password,
   });
-  User.save(newUser)
+  newUser.save()
     .then(res.json({ status: 200, message: 'Registered!' }))
     .catch(err => res.json({ status: `Error: ${err}` }));
 });
 
 app.post('/login', (req, res) => {
   User.find({ email: req.body.email })
-    .then(foundUser => res.json(foundUser))
+    .then(foundUser => res.json({ userObject: foundUser }))
     .catch(err => res.json({ status: `Error: ${err}` }));
 });
 
@@ -59,8 +59,8 @@ app.post('/savenewdocument', (req, res) => {
     collaborators: [],
     contents: '',
   });
-  Project.save(newProject)
-    .then(res.json({ status: 200, message: 'Created New Project' }))
+  newProject.save()
+    .then(project => res.json({ status: 200, message: 'Created New Project', id: project.id }))
     .catch(err => res.json({ status: `Error: ${err}` }));
 });
 
@@ -78,10 +78,26 @@ app.post('/savenewcollaborator', (req, res) => {
 app.post('/removecollaborator', (req, res) => {
   Project.findById(req.body.projectId)
     .then((project) => {
-      let newCollaboratorArr = project.collaborators;
+      const newCollaboratorArr = project.collaborators;
       newCollaboratorArr.splice(newCollaboratorArr.indexOf(req.body.collaboratorToBeRemoved), 1);
       Project.findByIdAndUpdate(project.id, { collaborators: newCollaboratorArr })
       .then(res.json({ status: 200, message: 'Successfully Added Collaborator' }))
+      .catch(err => res.json({ status: `Error: ${err}` }));
+    });
+});
+
+app.get('/loaduserprojects/:userid', (req, res) => {
+  Project.find()
+    .then((projects) => {
+      const userProjects = [];
+      projects.forEach((element) => {
+        element.collaborators.forEach((elementTwo) => {
+          if (elementTwo === req.params.userid) {
+            userProjects.push(element);
+          }
+        });
+      })
+      .then(res.json({ status: 200, message: 'Successfully Loaded Projects', projectObjects: userProjects }))
       .catch(err => res.json({ status: `Error: ${err}` }));
     });
 });
