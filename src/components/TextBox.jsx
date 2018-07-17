@@ -1,5 +1,5 @@
 import React from 'react';
-import { Editor, EditorState, RichUtils } from 'draft-js';
+import { Editor, EditorState, RichUtils, Modifier, convertToRaw } from 'draft-js';
 import { HuePicker } from 'react-color';
 // import 'draft-js/dist/Draft.css';
 
@@ -13,7 +13,6 @@ const blockStyles = [
   { style: 'header-five', title: 'H5' },
   { style: 'header-six', title: 'H6' },
   { style: 'blockquote', title: 'Quote' },
-  { style: 'unstyled', title: 'Clear Block Style' },
   { style: 'text-align-left', title: 'Left' },
   { style: 'text-align-center', title: 'Center' },
   { style: 'text-align-right', title: 'Right' },
@@ -35,7 +34,9 @@ export default class TextBox extends React.Component {
       color: '#fff',
       fontInput: 0,
     };
-    this.onChange = editorState => this.setState({ editorState });
+    this.onChange = editorState => {
+      this.setState({ editorState });
+    };
   }
 
 
@@ -52,12 +53,37 @@ export default class TextBox extends React.Component {
       block,
     ));
   }
+
+  clear() {
+    const { editorState } = this.state;
+    const selection = editorState.getSelection();
+    styleMap.BOLD = '';
+    styleMap.UNDERLINE = '';
+    styleMap.ITALIC = '';
+    styleMap.CODE = '';
+    const clearContentState = Object.keys(styleMap)
+            .reduce(
+              (contentState, style) => Modifier.removeInlineStyle(contentState, selection, style),
+              editorState.getCurrentContent(),
+          );
+    const newEditorState = EditorState.push(
+            editorState,
+            clearContentState,
+            'change-inline-style',
+          );
+    const newUnstyledEditorState = RichUtils.toggleBlockType(
+      newEditorState,
+      'unstyled',
+    );
+
+    this.onChange(newUnstyledEditorState);
+  }
   render() {
     return (
       <div id="textBox">
         <div id="textOptions">
           {blockStyles.map(({ style, title }) =>
-          (<button onClick={() => { this.block(style); }}>{title}</button>))}
+          (<button key={title} onClick={() => { this.block(style); }}>{title}</button>))}
           <br />
           <button onClick={() => { this.inline('BOLD'); }}><b>B</b></button>
           <button onClick={() => { this.inline('ITALIC'); }}><i>I</i></button>
@@ -66,6 +92,10 @@ export default class TextBox extends React.Component {
             this.inline('CODE'); this.block('code-block');
           }}
           >Code</button>
+          <button onClick={() => {
+            this.clear();
+          }}
+          >Default</button>
           <input
             onKeyPress={(e) => {
               if (e.key === 'Enter') {
