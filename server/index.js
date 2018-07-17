@@ -137,7 +137,7 @@ app.post('/savenewdocument', (req, res) => {
     contents: '',
   });
   newProject.save()
-    .then(project => res.json({ status: 200, message: 'Created New Project', id: project.id }))
+    .then(project => res.json({ status: 200, message: 'Created New Project', projectObject: project }))
     .catch(err => res.json({ status: `Error: ${err}` }));
 });
 
@@ -196,6 +196,14 @@ app.get('/loaduserprojects/', (req, res) => {
     .then(userProjects => res.json({ status: 200, message: 'Successfully Loaded Projects', projectObjects: userProjects }))
     .catch(err => res.json({ status: `Error: ${err}` }));
 });
+
+app.get('/loadproject/:documentid', (req, res) => {
+  Project.findById(req.params.documentid)
+    .exec()
+    .then(project => res.json({ status: 200, message: 'Successfully Retrieved Project', projectObject: project }))
+    .catch(err => res.json({ status: `Error: ${err}` }));
+});
+
 
 
 app.listen(process.env.port || 1337, () => { console.log('listening on port 1337') });

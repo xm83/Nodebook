@@ -12,8 +12,8 @@ class DocCard extends React.Component {
     }
   }
 
+
   render() {
-    console.log(this.props.user)
     return (
       <div>
         <p>{this.props.doc.title}</p>
