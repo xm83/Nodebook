@@ -57,7 +57,6 @@ class MainHub extends React.Component {
       }
     })
     .then((resp) => {
-      console.log(resp.data)
       this.setState({
         documents: resp.data.projectObjects,
         filteredDocuments: resp.data.projectObjects,
@@ -84,7 +83,6 @@ class MainHub extends React.Component {
     if (this.state.newDoc) {
       axios.post(`http://localhost:1337/savenewdocument`, {
         title: this.state.newDoc,
-        owner: this.state.currUser._id
       })
       .then((resp) => {
         if (resp.status === 200) {

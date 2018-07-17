@@ -143,8 +143,10 @@ app.post('/savenewdocument', (req, res) => {
 
 // Might Have to Move the .then and .catch
 app.post('/savenewcollaborator', (req, res) => {
+  console.log(req.body)
   Project.findById(req.body.projectId)
     .then((project) => {
+      console.log(project)
       const newCollaboratorArr = project.collaborators;
       newCollaboratorArr.push(req.body.newCollaborator);
       Project.findByIdAndUpdate(project.id, { collaborators: newCollaboratorArr })
@@ -181,6 +183,27 @@ app.get('/loadproject/:documentid', (req, res) => {
     .then(project => res.json({ status: 200, message: 'Successfully Retrieved Project', projectObject: project }))
     .catch(err => res.json({ status: `Error: ${err}` }));
 });
+
+app.get('/findUser/:userEmail', (req, res) => {
+  User.findOne({email: req.params.userEmail})
+  .then(user => res.json({ status: 200, message: 'Successfully Shared', shareUser: user}))
+  .catch(err => res.json({status: `Error: ${err}`}))
+})
+
+app.get('/getAllEditors/:docId', (req, res) => {
+  console.log(req.params.docId)
+  Project.findById(req.params.docId)
+  .populate('owner')
+  .populate('collaborators')
+  .exec((err, project) => {
+    if (err) {
+      console.log("error", err);
+    } else {
+      res.json({project: project})
+    }
+  })
+
+})
 
 app.get('/logout', function(req, res) {
   req.logout();
