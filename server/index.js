@@ -157,34 +157,19 @@ app.post('/removecollaborator', (req, res) => {
     });
 });
 
-// app.get('/loaduserprojects/', (req, res) => {
-//   Project.find()
-//     .exec()
-//     .then((projects) => {
-//       const userProjects = [];
-//       console.log(projects);
-//       console.log(req.query.userid);
-//       projects.forEach((element) => {
-//         element.collaborators.forEach((elementTwo) => {
-//           if (elementTwo === req.query.userid) {
-//             userProjects.push(element);
-//           }
-//         });
-//         if (element.owner === req.query.userid) {
-//           userProjects.push(element);
-//         }
-//       });
-//       res.json({ status: 200, message: 'Successfully Loaded Projects', projectObjects: userProjects });
-//     })
-//     .catch(err => res.json({ status: `Error: ${err}` }));
-// });
-
 app.get('/loaduserprojects/', (req, res) => {
   Project.find({ $or: [
     { collaborators: { $in: [req.user._id] } },
     { owner: { $eq: req.user._id } },
   ] })
     .then(userProjects => res.json({ status: 200, message: 'Successfully Loaded Projects', projectObjects: userProjects }))
+    .catch(err => res.json({ status: `Error: ${err}` }));
+});
+
+app.get('/loadproject/:documentid', (req, res) => {
+  Project.findById(req.params.documentid)
+    .exec()
+    .then(project => res.json({ status: 200, message: 'Successfully Retrieved Project', projectObject: project }))
     .catch(err => res.json({ status: `Error: ${err}` }));
 });
 
