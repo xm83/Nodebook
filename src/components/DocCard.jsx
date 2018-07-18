@@ -23,13 +23,10 @@ class DocCard extends React.Component {
         let newName = collabs[x].firstName + ' ' + collabs[x].lastName
         collabNames.push(newName)
       }
-      console.log("line by line?")
       this.setState({
         ownerName: res.data.project.owner.firstName + ' ' + res.data.project.owner.lastName,
         collaboratorNames: collabNames
       })
-      console.log(this.state.collaboratorNames)
-      console.log(res.data)
     })
   }
 

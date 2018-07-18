@@ -98,7 +98,7 @@ class Doc extends React.Component {
               </form>
             </Modal>
         </div>
-        <TextBox/>
+        <TextBox docId={this.props.doc._id} content={this.props.doc.contents} styles={this.props.doc.styles}/>
       </div>
     )
   }
