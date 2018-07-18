@@ -37,6 +37,7 @@ class Doc extends React.Component {
     this.openModal = this.openModal.bind(this);
     this.afterOpenModal = this.afterOpenModal.bind(this);
     this.closeModal = this.closeModal.bind(this);
+    this.cancel = this.cancel.bind(this);
   }
 
   componentDidMount() {
@@ -128,9 +129,9 @@ class Doc extends React.Component {
     })
   }
 
-  revert() {
+  cancel() {
     this.setState({
-      revert: true
+      versionDisplay: false
     })
   }
 
@@ -142,11 +143,6 @@ class Doc extends React.Component {
         </li>
       )
     });
-    let docContent = this.props.doc.contents;
-    if (this.state.revert) {
-      console.log('revert')
-    }
-
 
     return (!this.state.versionDisplay ?
       (<div>
@@ -175,10 +171,10 @@ class Doc extends React.Component {
               </form>
             </Modal>
         </div>
-        <TextBox docId={this.props.doc._id} content={docContent} styles={this.props.doc.styles}/>
-        <Button type="Version History" onClick={() => this.showVersions()} revert={()=>this.revert()} />
+        <TextBox docId={this.props.doc._id} content={this.props.doc.contents} styles={this.props.doc.styles}/>
+        <Button type="Version History" onClick={() => this.showVersions()} />
       </div>) :
-      (<History doc={this.props.doc}/>)
+      (<History doc={this.props.doc} cancel={() => this.cancel()} />)
     )
   }
 }

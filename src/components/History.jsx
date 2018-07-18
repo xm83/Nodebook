@@ -1,6 +1,7 @@
 import React from 'react';
 import axios from 'axios';
-import { Editor, EditorState, convertFromRaw } from 'draft-js';
+import { Editor, EditorState, convertFromRaw, convertToRaw } from 'draft-js';
+import Button from './Button'
 
 class History extends React.Component {
   constructor(props) {
@@ -44,7 +45,6 @@ class History extends React.Component {
 
   change(contents, style) {
     const text = convertFromRaw(JSON.parse(contents));
-    // console.log('text', text);
     let styles = {};
     if (style) {
       styles = JSON.parse(style);
@@ -56,7 +56,24 @@ class History extends React.Component {
   }
 
   revert(){
-    console.log(this.state.styleMap, this.state.editorState);
+    const { editorState } = this.state;
+    const raw = convertToRaw(editorState.getCurrentContent());
+    const contents =  JSON.stringify(raw);
+    const styles = JSON.stringify(this.state.styleMap);
+
+    axios.post(`http://localhost:1337/saveContent/${this.props.doc._id}`, {
+      content: contents,
+      style: styles,
+    })
+    .then((resp) => {
+      if (resp.status === 200) {
+        console.log('Reverted');
+        this.props.cancel();
+      }
+    })
+    .catch((err) => {
+      console.log('Error: ', err);
+    });
   }
 
   render() {
@@ -76,7 +93,8 @@ class History extends React.Component {
             onClick={() => { this.change(version.contents, version.style); }}
           >{version.date}</button>))}</div>
         </div>
-        <button onClick={() => { this.revert() }}> Revert Changes </button>
+        <Button onClick={() => this.revert()} type="Revert Changes" />
+        <Button onClick={() => this.props.cancel() } type="Cancel" />
       </div>
     );
   }

@@ -6,7 +6,6 @@ import Modal from 'react-modal';
 import Doc from './Doc';
 import axios from 'axios'
 import DocCard from './DocCard'
-import History from './History'
 import { ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap'
 
 const customStyles = {
@@ -171,7 +170,7 @@ class MainHub extends React.Component {
       docRender = this.state.filteredDocuments.map((doc, i) => <DocCard key={i} doc={doc} deleteDoc={()=>this.deleteDoc(doc._id)} openDoc={()=>this.openDoc(doc._id)} /> )
     }
     return (this.state.openDoc ?
-      (<History doc={this.state.loadDoc} id={this.state.currUser} goHome={() => this.goHome()} />)
+      (<Doc doc={this.state.loadDoc} id={this.state.currUser} goHome={() => this.goHome()} />)
       :
       (
         <div>
