@@ -73,17 +73,22 @@ class Doc extends React.Component {
       })
       .then((resp) => {
         console.log(resp.data)
-        this.setState({
-          email: "",
-          collaborators: resp.data.collaborators.collab
+        axios.post(`http://localhost:1337/populateCollaborators`, {
+          docId: this.props.doc._id
         })
-        if (resp.data.status === 200) {
-          this.closeModal()
-        }
-        if (resp.data.status === 202) {
+        .then((resp) => {
+          this.setState({
+            email: "",
+            collaborators: resp.data.collaborators.collaborators
+          })
+          if (resp.data.status === 200) {
+            this.closeModal()
+          }
+          if (resp.data.status === 202) {
 
-          alert('This User Already Has Access To The Document')
-        }
+            alert('This User Already Has Access To The Document')
+          }
+        })
       })
     })
     .catch((err) => {
