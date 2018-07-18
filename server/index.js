@@ -258,7 +258,8 @@ app.post('/saveContent/:docId', (req, res) => {
 });
 
 app.get('/logout', (req) => {
-  req.logout();
+  req.session.destroy()
+  // req.logout();
 });
 
 
