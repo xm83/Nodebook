@@ -227,15 +227,25 @@ app.get('/getAllEditors/:docId', (req, res) => {
 });
 
 app.post('/saveContent/:docId', (req, res) => {
-  Project.findByIdAndUpdate(req.params.docId, {
-    contents: req.body.content,
-    styles: req.body.style,
-  })
-  .then(res.json({ status: 200, message: 'Saved' }))
-  .catch(err => res.json({ status: `Error: ${err}` }));
+  Project.findById(req.params.docId)
+  .then((version) => {
+    const newVersionArr = version.versions;
+    newVersionArr.push({
+      contents: req.body.content,
+      styles: req.body.style,
+      date: new Date().toISOString(),
+    });
+    Project.findByIdAndUpdate(req.params.docId, {
+      contents: req.body.content,
+      styles: req.body.style,
+      versions: newVersionArr,
+    })
+      .then(res.json({ status: 200, message: 'Saved' }))
+      .catch(err => res.json({ status: `Error: ${err}` }));
+  });
 });
 
-app.get('/logout', (req, res) => {
+app.get('/logout', (req) => {
   req.logout();
 });
 
