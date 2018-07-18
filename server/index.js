@@ -151,6 +151,20 @@ app.post('/savenewdocument', (req, res) => {
     .catch(err => res.json({ status: `Error: ${err}` }));
 });
 
+//Manny's Clean Code
+app.post('/deletedoc', async (req, res) => {
+  const project = await Project.findById(req.body.docId);
+  if (req.body.userId == project.owner) {
+    var deleted = await Project.findByIdAndDelete(req.body.docId)
+    var allProjects = await Project.find({ $or: [
+      { collaborators: { $in: [req.body.userId] } },
+      { owner: { $eq: req.body.userId } },
+    ] })
+    var populatedProjects = allProjects.map((project) => project.populate('owner', 'collaborators'))
+    console.log(populatedProjects)
+    res.json({ status: 200, message: 'Deleted', projObjects: populatedProjects})
+  }
+})
 // Might Have to Move the .then and .catch
 app.post('/savenewcollaborator', (req, res) => {
   console.log(req.body)
