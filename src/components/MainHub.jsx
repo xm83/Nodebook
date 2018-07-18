@@ -19,6 +19,8 @@ const customStyles = {
   }
 };
 
+let docCards
+
 Modal.setAppElement('#App')
 
 //This Component Brings the User to the Main Hub of the page, where he/she can see all
@@ -149,9 +151,8 @@ class MainHub extends React.Component {
       userId: this.state.currUser._id
     })
     .then((resp) => {
-      console.log('Hey', resp)
       this.setState({
-        filteredDocuments: resp.data.projObjects
+        filteredDocuments: resp.data.projectObjects
       })
     })
     .catch((err) => {
@@ -164,10 +165,26 @@ class MainHub extends React.Component {
     this.props.logOut()
   }
 
+  // reRenderDocCards() {
+  //   if (this.state.filteredDocuments) {
+  //     docRender = this.state.filteredDocuments.map((doc, i) => <DocCard key={i} doc={doc} deleteDoc={()=>this.deleteDoc(doc._id)} openDoc={()=>this.openDoc(doc._id)} /> )
+  //   }
+  // }
+
   render() {
     let docRender;
     if (this.state.filteredDocuments) {
-      docRender = this.state.filteredDocuments.map((doc, i) => <DocCard key={i} doc={doc} deleteDoc={()=>this.deleteDoc(doc._id)} openDoc={()=>this.openDoc(doc._id)} /> )
+      docRender = this.state.filteredDocuments.map((doc, i) => {
+        let collabNames = "";
+        for (var x = 0; x < doc.collaborators.length; x++) {
+          if (x === doc.collaborators.length-1) {
+              collabNames += (doc.collaborators[x].firstName + ' ' + doc.collaborators[x].lastName)
+          } else {
+            collabNames += (doc.collaborators[x].firstName + ' ' + doc.collaborators[x].lastName + ', ')
+          }
+        }
+        return <DocCard collabs={collabNames} key={i} doc={doc} deleteDoc={()=>this.deleteDoc(doc._id)} openDoc={()=>this.openDoc(doc._id)} />
+      })
     }
     return (this.state.openDoc ?
       (<Doc doc={this.state.loadDoc} id={this.state.currUser} goHome={() => this.goHome()} />)
