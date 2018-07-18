@@ -2,8 +2,9 @@ import React from 'react';
 import { Editor, EditorState, RichUtils, Modifier, convertToRaw, convertFromRaw } from 'draft-js';
 import { HuePicker } from 'react-color';
 // import 'draft-js/dist/Draft.css';
-import axios from 'axios'
-import Button from './Button'
+import axios from 'axios';
+import Button from './Button';
+import _ from 'underscore';
 
 const blockStyles = [
   { style: 'header-one', title: 'H1' },
@@ -34,10 +35,11 @@ export default class TextBox extends React.Component {
       color: '#fff',
       fontInput: 0,
       styleMap: {},
-      interval: "",
+      interval: '',
       autoSave: false,
+      search: '',
     };
-    this.onChange = editorState => {
+    this.onChange = (editorState) => {
       this.setState({ editorState });
     };
   }
@@ -45,20 +47,20 @@ export default class TextBox extends React.Component {
   componentDidMount() {
     let intervalId = setInterval(() => this.save(), 30000);
     if (this.props.content) {
-      let text = convertFromRaw(JSON.parse(this.props.content))
-      let styles = JSON.parse(this.props.styles)
+      const text = convertFromRaw(JSON.parse(this.props.content))
+      const styles = JSON.parse(this.props.styles)
       this.setState({
         editorState: EditorState.createWithContent(text),
         styleMap: styles,
-      })
+      });
     }
     this.setState({
-      interval: intervalId
-    })
+      interval: intervalId,
+    });
   }
 
   componentWillUnmount() {
-    clearInterval(this.state.interval)
+    clearInterval(this.state.interval);
   }
 
   inline(inline) {
@@ -101,32 +103,85 @@ export default class TextBox extends React.Component {
   }
 
   save() {
-   this.setState({
-     autoSave:true
-   })
-   const { editorState } = this.state;
-   const raw = convertToRaw(editorState.getCurrentContent());
-   axios.post(`http://localhost:1337/saveContent/${this.props.docId}`, {
-     content: JSON.stringify(raw),
-     style: JSON.stringify(this.state.styleMap)
-   })
-   .then((resp) => {
-     if (resp.status === 200) {
-       console.log('Saved');
-       setTimeout(()=>this.setState({
-         autoSave:false
-       }), 1000)
-     }
-   })
-   .catch((err) => {
-     console.log('Error: ', err);
-   });
- }
+    this.setState({
+      autoSave: true,
+    });
+    const { editorState } = this.state;
+    const raw = convertToRaw(editorState.getCurrentContent());
+    _.each(raw.blocks, (block) => {
+      block.inlineStyleRanges = block.inlineStyleRanges.filter(style => (
+        style.style !== 'highlighted'
+      ));
+    });
+    axios.post(`http://localhost:1337/saveContent/${this.props.docId}`, {
+      content: JSON.stringify(raw),
+      style: JSON.stringify(this.state.styleMap),
+    })
+    .then((resp) => {
+      if (resp.status === 200) {
+        console.log('Saved');
+        setTimeout(() => this.setState({
+          autoSave: false,
+        }), 1000);
+      }
+    })
+    .catch((err) => {
+      console.log('Error: ', err);
+    });
+  }
+
+  search(search) {
+    this.state.styleMap.highlighted = { backgroundColor: 'yellow' };
+    const { editorState } = this.state;
+    const raw = convertToRaw(editorState.getCurrentContent());
+    _.each(raw.blocks, (block) => {
+      const sLen = search.length;
+      for (let i = 0; i < block.text.length; i ++) {
+        if (block.text.substr(i, sLen) === search) {
+          let checked = false;
+          for (let j = 0; j < block.inlineStyleRanges.length; j++) {
+            if (block.inlineStyleRanges[j].style === 'highlighted' &&
+             block.inlineStyleRanges[j].offset === i) {
+              block.inlineStyleRanges[j] = {
+                offset: i,
+                length: sLen,
+                style: 'highlighted',
+              };
+              checked = true;
+            }
+          }
+          if (!checked) {
+            block.inlineStyleRanges.push({
+              offset: i,
+              length: sLen,
+              style: 'highlighted',
+            });
+          }
+        } else {
+          block.inlineStyleRanges = block.inlineStyleRanges.filter(style =>
+                (!(style.offset === i && style.style === 'highlighted')));
+        }
+      }
+    });
+
+    const cooked = convertFromRaw(raw);
+    this.setState({
+      editorState: EditorState.createWithContent(cooked),
+      search,
+    });
+    // console.log(raw);
+  }
 
   render() {
     return (
       <div id="textBox">
         <div id="textOptions">
+          <input
+            type="string"
+            value={this.state.search}
+            placeholder="Search"
+            onChange={(e) => { this.search(e.target.value); }}
+          /> <br />
           {blockStyles.map(({ style, title }) =>
           (<button key={title} onClick={() => { this.block(style); }}>{title}</button>))}
           <br />

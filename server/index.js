@@ -12,6 +12,14 @@ const User = require('./models').User;
 
 const Project = require('./models').Project;
 
+//socket setup
+const http = require('http').Server(app);
+const io = require('socket.io')(http);
+
+io.on('connection', (socket) => {
+  console.log("connected to socket! socket:", socket);
+})
+
 mongoose.connect(process.env.MONGODB_URI);
 
 
@@ -126,8 +134,10 @@ app.use('/*', (req, res, next) => {
 });
 
 app.get('/', (req, res) => {
-  res.json({ status: 200, message: 'user logged in!' });
-});
+  User.findById(req.user.id)
+  .then(user => res.json({ status: 200, message: 'user logged in!', user: user}))
+  .catch(err => res.json({status: `Error: ${err}`}))
+})
 
 app.post('/savenewdocument', (req, res) => {
   const newProject = new Project({
