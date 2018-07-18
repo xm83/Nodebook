@@ -88,7 +88,8 @@ class MainHub extends React.Component {
         if (resp.status === 200) {
           this.setState({
             openDoc: true,
-            loadDoc: resp.data.projectObject
+            loadDoc: resp.data.projectObject,
+            newDoc: ""
           })
         }
       })
@@ -103,7 +104,7 @@ class MainHub extends React.Component {
     .then((resp) => {
       console.log('frontend', resp.data)
       this.setState({
-        documents: resp.data.projectObjects,
+        filteredDocuments: resp.data.projectObjects,
         openDoc: false,
       });
       this.closeModal()
@@ -131,11 +132,30 @@ class MainHub extends React.Component {
   openDoc(docId) {
     axios.get(`http://localhost:1337/loadproject/` + docId)
     .then((proj) => {
-      console.log(proj.data)
       this.setState({
         openDoc: !this.state.openDoc,
         loadDoc: proj.data.projectObject
       })
+    })
+    .catch((err) => {
+      console.log(err)
+    })
+  }
+
+  //NOT WORKING PROPERLY. DELETES< BUT THE RE-RENDER IS FUCKING UP
+  deleteDoc(docId) {
+    axios.post(`http://localhost:1337/deletedoc`, {
+      docId: docId,
+      userId: this.state.currUser._id
+    })
+    .then((resp) => {
+      console.log('Hey', resp)
+      if (resp.data.status === 200) {
+        this.setState({
+          documents: resp.data.projObjects,
+        })
+        this.componentDidMount()
+      }
     })
     .catch((err) => {
       console.log(err)
@@ -150,7 +170,7 @@ class MainHub extends React.Component {
   render() {
     let docRender;
     if (this.state.filteredDocuments) {
-      docRender = this.state.filteredDocuments.map((doc, i) => <DocCard key={i} user={this.state.currUser} doc={doc} openDoc={()=>this.openDoc(doc._id)} /> )
+      docRender = this.state.filteredDocuments.map((doc, i) => <DocCard key={i} user={this.state.currUser} doc={doc} deleteDoc={()=>this.deleteDoc(doc._id)} openDoc={()=>this.openDoc(doc._id)} /> )
     }
     return (this.state.openDoc ?
       (<Doc doc={this.state.loadDoc} id={this.state.currUser} goHome={() => this.goHome()} />)
