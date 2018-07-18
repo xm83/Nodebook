@@ -13,12 +13,11 @@ const User = require('./models').User;
 const Project = require('./models').Project;
 
 //socket setup
-var http = require('http').Server(app);
-var io = require('socket.io')(http);
-import{auth} from './socket-api'
+const http = require('http').Server(app);
+const io = require('socket.io')(http);
 
-io.on('connection', function(socket) {
-  auth(socket);
+io.on('connection', (socket) => {
+  console.log("connected to socket! socket:", socket);
 })
 
 mongoose.connect(process.env.MONGODB_URI);

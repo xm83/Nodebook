@@ -13,20 +13,23 @@ export default class App extends React.Component {
     super(props)
     this.state = {
       loggedIn: false,
-      connecting: true
+      connected: false
     }
   }
 
   componentDidMount() {
     // socket setup
     this.socket = io('http://localhost:1337')
-    this.socket.on('connect', () => {
+    // if there is a connection event from server:
+    this.socket.on('connection', () => {
+      console.log("connected to socket!")
       this.setState({
-        connecting: null
+        connecting: true
       })
     })
+    // if there is a disconnect event from server:
     this.socket.on('disconnect', () => this.setState({
-      connecting: true
+      connecting: false
     }))
 
 
@@ -40,11 +43,11 @@ export default class App extends React.Component {
           loggedIn: true
         })
 
-        // emit login event 
-        this.socket.emit('login', {email: res.data.user.email, password: res.data.user.password}, (res) => {
-          console.log('status:', res);
+        // // emit login event - no need to do this
+        // this.socket.emit('login', {email: res.data.user.email, password: res.data.user.password}, (res) => {
+        //   console.log('status:', res);
 
-        })
+        // })
 
       } else {
         this.setState({
