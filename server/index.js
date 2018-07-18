@@ -186,13 +186,18 @@ app.post('/removecollaborator', (req, res) => {
   Project.findById(req.body.projectId)
     .exec()
     .then((project) => {
-      const newCollaboratorArr = project.collaborators;
-      newCollaboratorArr.splice(newCollaboratorArr.indexOf(req.body.collaboratorToBeRemoved), 1);
-      Project.findByIdAndUpdate(project.id, { collaborators: newCollaboratorArr })
-      .populate('collaborators')
-      .then(res.json({ status: 200, message: 'Successfully Remove Collaborator', collaborators: newCollaboratorArr}))
-      .catch(err => res.json({ status: `Error: ${err}` }));
-    });
+      if (req.user._id === project.owner) {
+        const newCollaboratorArr = project.collaborators;
+        newCollaboratorArr.splice(newCollaboratorArr.indexOf(req.body.collaboratorToBeRemoved), 1);
+        Project.findByIdAndUpdate(project.id, { collaborators: newCollaboratorArr })
+        .populate('collaborators')
+        .then(res.json({ status: 200, message: 'Successfully Remove Collaborator', collaborators: newCollaboratorArr}))
+      } else {
+        res.json({status: 202, message: 'Sorry, You Do Not Have Permission'})
+      }
+
+    })
+    .catch(err => res.json({ status: `Error: ${err}` }));
 });
 
 app.get('/loaduserprojects/', (req, res) => {
