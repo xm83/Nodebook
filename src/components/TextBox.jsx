@@ -108,6 +108,11 @@ export default class TextBox extends React.Component {
     });
     const { editorState } = this.state;
     const raw = convertToRaw(editorState.getCurrentContent());
+    _.each(raw.blocks, (block) => {
+      block.inlineStyleRanges = block.inlineStyleRanges.filter(style => (
+        style.style !== 'highlighted'
+      ));
+    });
     axios.post(`http://localhost:1337/saveContent/${this.props.docId}`, {
       content: JSON.stringify(raw),
       style: JSON.stringify(this.state.styleMap),
@@ -135,7 +140,8 @@ export default class TextBox extends React.Component {
         if (block.text.substr(i, sLen) === search) {
           let checked = false;
           for (let j = 0; j < block.inlineStyleRanges.length; j++) {
-            if (block.inlineStyleRanges[j].style === 'highlighted') {
+            if (block.inlineStyleRanges[j].style === 'highlighted' &&
+             block.inlineStyleRanges[j].offset === i) {
               block.inlineStyleRanges[j] = {
                 offset: i,
                 length: sLen,
