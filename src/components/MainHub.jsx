@@ -150,12 +150,9 @@ class MainHub extends React.Component {
     })
     .then((resp) => {
       console.log('Hey', resp)
-      if (resp.data.status === 200) {
-        this.setState({
-          documents: resp.data.projObjects,
-        })
-        this.componentDidMount()
-      }
+      this.setState({
+        filteredDocuments: resp.data.projObjects
+      })
     })
     .catch((err) => {
       console.log(err)
@@ -170,7 +167,7 @@ class MainHub extends React.Component {
   render() {
     let docRender;
     if (this.state.filteredDocuments) {
-      docRender = this.state.filteredDocuments.map((doc, i) => <DocCard key={i} user={this.state.currUser} doc={doc} deleteDoc={()=>this.deleteDoc(doc._id)} openDoc={()=>this.openDoc(doc._id)} /> )
+      docRender = this.state.filteredDocuments.map((doc, i) => <DocCard key={i} doc={doc} deleteDoc={()=>this.deleteDoc(doc._id)} openDoc={()=>this.openDoc(doc._id)} /> )
     }
     return (this.state.openDoc ?
       (<Doc doc={this.state.loadDoc} id={this.state.currUser} goHome={() => this.goHome()} />)

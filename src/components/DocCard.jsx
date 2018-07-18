@@ -15,6 +15,7 @@ class DocCard extends React.Component {
   }
 
   componentDidMount() {
+    console.log(this.props.doc)
     axios.get(`http://localhost:1337/getAllEditors/` + this.props.doc._id)
     .then((res) => {
       let collabNames = []
@@ -23,12 +24,18 @@ class DocCard extends React.Component {
         let newName = collabs[x].firstName + ' ' + collabs[x].lastName
         collabNames.push(newName)
       }
-      console.log(this.state.ownerName)
+
       this.setState({
         ownerName: res.data.project.owner.firstName + ' ' + res.data.project.owner.lastName,
         collaboratorNames: collabNames
       })
     })
+  }
+
+  shouldComponentUpdate(prevProps, nextProps) {
+    console.log(prevProps)
+    console.log(nextProps)
+    return true
   }
 
   render() {

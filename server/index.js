@@ -150,8 +150,9 @@ app.post('/deletedoc', async (req, res) => {
       { collaborators: { $in: [req.body.userId] } },
       { owner: { $eq: req.body.userId } },
     ] })
-    console.log(allProjects)
-    res.json({ status: 200, message: 'Deleted', projObjects: allProjects})
+    var populatedProjects = allProjects.map((project) => project.populate('owner', 'collaborators'))
+    console.log(populatedProjects)
+    res.json({ status: 200, message: 'Deleted', projObjects: populatedProjects})
   }
 })
 // Might Have to Move the .then and .catch
