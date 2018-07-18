@@ -1,10 +1,10 @@
 import React from 'react';
 import { Editor, EditorState, RichUtils, Modifier, convertToRaw, convertFromRaw } from 'draft-js';
 import { HuePicker } from 'react-color';
-// import 'draft-js/dist/Draft.css';
+import _ from 'underscore';
+
 import axios from 'axios';
 import Button from './Button';
-import _ from 'underscore';
 
 const blockStyles = [
   { style: 'header-one', title: 'H1' },
@@ -169,7 +169,53 @@ export default class TextBox extends React.Component {
       editorState: EditorState.createWithContent(cooked),
       search,
     });
-    // console.log(raw);
+  }
+
+  regex() {
+    const search = this.state.search;
+    this.state.styleMap.highlighted = { backgroundColor: 'yellow' };
+    const { editorState } = this.state;
+    const raw = convertToRaw(editorState.getCurrentContent());
+
+    const regex = new RegExp(search, 'g');
+    _.each(raw.blocks, (block) => {
+      let match;
+      const text = block.text
+      while ((match = regex.exec(text)) != null) {
+        if (match) {
+          const mLen = match[0].length;
+          let checked = false;
+          for (let j = 0; j < block.inlineStyleRanges.length; j++) {
+            if (block.inlineStyleRanges[j].style === 'highlighted' &&
+             block.inlineStyleRanges[j].offset === match.index) {
+              block.inlineStyleRanges[j] = {
+                offset: match.index,
+                length: mLen,
+                style: 'highlighted',
+              };
+              checked = true;
+            }
+          }
+          if (!checked) {
+            block.inlineStyleRanges.push({
+              offset: match.index,
+              length: mLen,
+              style: 'highlighted',
+            });
+          }
+        } else {
+          block.inlineStyleRanges = block.inlineStyleRanges.filter(style =>
+                (!style.style === 'highlighted'));
+        }
+      }
+    });
+
+
+    const cooked = convertFromRaw(raw);
+    this.setState({
+      editorState: EditorState.createWithContent(cooked),
+      search,
+    });
   }
 
   render() {
@@ -181,7 +227,7 @@ export default class TextBox extends React.Component {
             value={this.state.search}
             placeholder="Search"
             onChange={(e) => { this.search(e.target.value); }}
-          /> <br />
+          /><button onClick={() => { this.regex(); }}>RegEx</button> <br />
           {blockStyles.map(({ style, title }) =>
           (<button key={title} onClick={() => { this.block(style); }}>{title}</button>))}
           <br />
