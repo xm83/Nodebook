@@ -146,7 +146,6 @@ app.post('/savenewcollaborator', (req, res) => {
   console.log(req.body)
   Project.findById(req.body.projectId)
     .then((project) => {
-      console.log(project)
       const newCollaboratorArr = project.collaborators;
       newCollaboratorArr.push(req.body.newCollaborator);
       Project.findByIdAndUpdate(project.id, { collaborators: newCollaboratorArr })
@@ -191,7 +190,6 @@ app.get('/findUser/:userEmail', (req, res) => {
 })
 
 app.get('/getAllEditors/:docId', (req, res) => {
-  console.log(req.params.docId)
   Project.findById(req.params.docId)
   .populate('owner')
   .populate('collaborators')
@@ -202,6 +200,11 @@ app.get('/getAllEditors/:docId', (req, res) => {
       res.json({project: project})
     }
   })
+})
+
+app.post('/saveContent/:docId', (req, res) => {
+  Project.findByIdAndUpdate(req.params.docId, {contents: req.body.content, styles: req.body.style})
+  .then((content) => res.json({status: 200, message: 'Saved'}))
 
 })
 

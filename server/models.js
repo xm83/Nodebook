@@ -29,6 +29,10 @@ const projectSchema = Schema({
     default: []
   },
   contents: String,
+  styles: {
+    type: String,
+    default: ''
+  }
 });
 
 // Convert Schemas to Models

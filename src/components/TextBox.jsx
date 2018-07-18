@@ -1,10 +1,10 @@
 import React from 'react';
-import { Editor, EditorState, RichUtils, Modifier, convertToRaw } from 'draft-js';
+import { Editor, EditorState, RichUtils, Modifier, convertToRaw, convertFromRaw } from 'draft-js';
 import { HuePicker } from 'react-color';
 // import 'draft-js/dist/Draft.css';
+import axios from 'axios'
+import Button from './Button'
 
-
-const styleMap = {};
 const blockStyles = [
   { style: 'header-one', title: 'H1' },
   { style: 'header-two', title: 'H2' },
@@ -33,12 +33,33 @@ export default class TextBox extends React.Component {
       editorState: EditorState.createEmpty(),
       color: '#fff',
       fontInput: 0,
+      styleMap: {},
+      interval: "",
+      autoSave: false,
     };
     this.onChange = editorState => {
       this.setState({ editorState });
     };
   }
 
+  componentDidMount() {
+    let intervalId = setInterval(() => this.save(), 30000);
+    if (this.props.content) {
+      let text = convertFromRaw(JSON.parse(this.props.content))
+      let styles = JSON.parse(this.props.styles)
+      this.setState({
+        editorState: EditorState.createWithContent(text),
+        styleMap: styles,
+      })
+    }
+    this.setState({
+      interval: intervalId
+    })
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.state.interval)
+  }
 
   inline(inline) {
     this.onChange(RichUtils.toggleInlineStyle(
@@ -57,11 +78,11 @@ export default class TextBox extends React.Component {
   clear() {
     const { editorState } = this.state;
     const selection = editorState.getSelection();
-    styleMap.BOLD = '';
-    styleMap.UNDERLINE = '';
-    styleMap.ITALIC = '';
-    styleMap.CODE = '';
-    const clearContentState = Object.keys(styleMap)
+    this.state.styleMap.BOLD = '';
+    this.state.styleMap.UNDERLINE = '';
+    this.state.styleMap.ITALIC = '';
+    this.state.styleMap.CODE = '';
+    const clearContentState = Object.keys(this.state.styleMap)
             .reduce(
               (contentState, style) => Modifier.removeInlineStyle(contentState, selection, style),
               editorState.getCurrentContent(),
@@ -78,6 +99,30 @@ export default class TextBox extends React.Component {
 
     this.onChange(newUnstyledEditorState);
   }
+
+  save() {
+   this.setState({
+     autoSave:true
+   })
+   const { editorState } = this.state;
+   const raw = convertToRaw(editorState.getCurrentContent());
+   axios.post(`http://localhost:1337/saveContent/${this.props.docId}`, {
+     content: JSON.stringify(raw),
+     style: JSON.stringify(this.state.styleMap)
+   })
+   .then((resp) => {
+     if (resp.status === 200) {
+       console.log('Saved');
+       setTimeout(()=>this.setState({
+         autoSave:false
+       }), 1000)
+     }
+   })
+   .catch((err) => {
+     console.log('Error: ', err);
+   });
+ }
+
   render() {
     return (
       <div id="textBox">
@@ -99,7 +144,7 @@ export default class TextBox extends React.Component {
           <input
             onKeyPress={(e) => {
               if (e.key === 'Enter') {
-                styleMap[String(e.target.value)] = { fontSize: e.target.value };
+                this.state.styleMap[String(e.target.value)] = { fontSize: e.target.value };
                 this.inline(String(e.target.value));
               }
             }
@@ -113,7 +158,7 @@ export default class TextBox extends React.Component {
           <HuePicker
             color={this.state.color}
             onChangeComplete={(color) => {
-              styleMap[String(color.hex)] = { color: color.hex };
+              this.state.styleMap[String(color.hex)] = { color: color.hex };
               this.setState({ color: color.hex });
               this.inline(String(color.hex));
             }}
@@ -122,11 +167,13 @@ export default class TextBox extends React.Component {
         <div className="editor">
           <Editor
             blockStyleFn={getBlockStyle}
-            customStyleMap={styleMap}
+            customStyleMap={this.state.styleMap}
             editorState={this.state.editorState}
             onChange={this.onChange}
           />
         </div>
+        {(this.state.autoSave)?<p>Saving...</p>:<p></p>}
+        <Button type="Save" onClick={()=>this.save()}/>
       </div>
     );
   }
