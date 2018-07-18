@@ -103,14 +103,18 @@ class Doc extends React.Component {
     })
     .then((resp) => {
       console.log(resp)
-      axios.post(`http://localhost:1337/populateCollaborators`, {
-        docId: this.props.doc._id
-      })
-      .then((resp) => {
-        this.setState({
-          collaborators: resp.data.collaborators.collaborators
+      if (resp.data.status === 200) {
+        axios.post(`http://localhost:1337/populateCollaborators`, {
+          docId: this.props.doc._id
         })
-      })
+        .then((resp) => {
+          this.setState({
+            collaborators: resp.data.collaborators.collaborators
+          })
+        })
+      } else {
+        alert(resp.data.message)
+      }
     })
   }
 
