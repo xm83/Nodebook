@@ -156,28 +156,31 @@ app.post('/deletedoc', async (req, res) => {
   const project = await Project.findById(req.body.docId);
   if (req.body.userId == project.owner) {
     var deleted = await Project.findByIdAndDelete(req.body.docId)
-    var allProjects = await Project.find({ $or: [
-      { collaborators: { $in: [req.body.userId] } },
-      { owner: { $eq: req.body.userId } },
-    ] })
-    var populatedProjects = allProjects.map((project) => project.populate('owner', 'collaborators'))
-    console.log(populatedProjects)
-    res.json({ status: 200, message: 'Deleted', projObjects: populatedProjects})
+    res.redirect('/loaduserprojects/')
   }
 })
 // Might Have to Move the .then and .catch
 app.post('/savenewcollaborator', (req, res) => {
-  console.log(req.body);
   Project.findById(req.body.projectId)
     .then((project) => {
       const newCollaboratorArr = project.collaborators;
-      newCollaboratorArr.push(req.body.newCollaborator);
-      Project.findByIdAndUpdate(project.id, { collaborators: newCollaboratorArr })
-      .then(res.json({ status: 200, message: 'Successfully Added Collaborator' }))
-      .catch(err => res.json({ status: `Error: ${err}` }));
-    });
+      if (newCollaboratorArr.indexOf(req.body.newCollaborator) > -1) {
+        res.json({ status: 202, message: 'User is already added'})
+      } else {
+        newCollaboratorArr.push(req.body.newCollaborator);
+        Project.findByIdAndUpdate(project.id, { collaborators: newCollaboratorArr })
+        .then(res.json({ status: 200, message: 'Successfully Added Collaborator', collaborators: newCollaboratorArr }))
+      }
+    })
+    .catch(err => res.json({ status: `Error: ${err}` }));
 });
 
+app.post('/populateCollaborators', (req,res) => {
+  Project.findById(req.body.docId)
+  .populate('collaborators')
+  .exec()
+  .then((populatedProjects) => res.json({ status: 200, message: 'Populated Collaborators', collaborators: populatedProjects }))
+})
 // Might Have to Move the .then and .catch
 app.post('/removecollaborator', (req, res) => {
   Project.findById(req.body.projectId)
@@ -186,7 +189,8 @@ app.post('/removecollaborator', (req, res) => {
       const newCollaboratorArr = project.collaborators;
       newCollaboratorArr.splice(newCollaboratorArr.indexOf(req.body.collaboratorToBeRemoved), 1);
       Project.findByIdAndUpdate(project.id, { collaborators: newCollaboratorArr })
-      .then(res.json({ status: 200, message: 'Successfully Added Collaborator' }))
+      .populate('collaborators')
+      .then(res.json({ status: 200, message: 'Successfully Remove Collaborator', collaborators: newCollaboratorArr}))
       .catch(err => res.json({ status: `Error: ${err}` }));
     });
 });
@@ -196,6 +200,9 @@ app.get('/loaduserprojects/', (req, res) => {
     { collaborators: { $in: [req.user._id] } },
     { owner: { $eq: req.user._id } },
   ] })
+    .populate('owner')
+    .populate('collaborators')
+    .exec()
     .then(userProjects => res.json({ status: 200, message: 'Successfully Loaded Projects', projectObjects: userProjects }))
     .catch(err => res.json({ status: `Error: ${err}` }));
 });

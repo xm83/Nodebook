@@ -27,13 +27,26 @@ class Doc extends React.Component {
     this.state = {
       modalIsOpen: false,
       shareUserId: "",
-      email: ""
+      email: "",
+      collaborators: []
     }
 
     this.openModal = this.openModal.bind(this);
     this.afterOpenModal = this.afterOpenModal.bind(this);
     this.closeModal = this.closeModal.bind(this);
   }
+
+  componentDidMount() {
+    axios.post(`http://localhost:1337/populateCollaborators`, {
+      docId: this.props.doc._id
+    })
+    .then((resp) => {
+      this.setState({
+        collaborators: resp.data.collaborators.collaborators
+      })
+    })
+  }
+
 
   openModal = () => {
     this.setState({modalIsOpen: true});
@@ -59,13 +72,23 @@ class Doc extends React.Component {
         projectId: this.props.doc._id
       })
       .then((resp) => {
-        if (resp.status === 200) {
+        console.log(resp.data)
+        axios.post(`http://localhost:1337/populateCollaborators`, {
+          docId: this.props.doc._id
+        })
+        .then((resp) => {
           this.setState({
-            shareUserId: "",
+            email: "",
+            collaborators: resp.data.collaborators.collaborators
           })
-        }
-        console.log(resp)
-        this.closeModal()
+          if (resp.data.status === 200) {
+            this.closeModal()
+          }
+          if (resp.data.status === 202) {
+
+            alert('This User Already Has Access To The Document')
+          }
+        })
       })
     })
     .catch((err) => {
@@ -73,7 +96,37 @@ class Doc extends React.Component {
     })
   }
 
+  removeColl(id) {
+    axios.post(`http://localhost:1337/removecollaborator`, {
+      projectId: this.props.doc._id,
+      collaboratorToBeRemoved: id
+    })
+    .then((resp) => {
+      console.log(resp)
+      axios.post(`http://localhost:1337/populateCollaborators`, {
+        docId: this.props.doc._id
+      })
+      .then((resp) => {
+        this.setState({
+          collaborators: resp.data.collaborators.collaborators
+        })
+      })
+    })
+  }
+
+
+
   render(){
+    let collabNames = this.state.collaborators.map((collab) => {
+      console.log(collab)
+      console.log(this.state.collaborators)
+      return (
+        <li>
+          {collab.firstName} {collab.lastName} <Button type="Remove" onClick={() => this.removeColl(collab._id)} />
+        </li>
+      )
+    });
+
     return (
       <div>
         <h1> {this.props.doc.title} </h1>
@@ -87,7 +140,10 @@ class Doc extends React.Component {
             style={customStyles}
             contentLabel="Share Your Document"
           >
-            <h2 ref={subtitle => this.subtitle = subtitle}> Share Your Document </h2>
+            <h2 ref={subtitle => this.subtitle = subtitle}> Users On This Document </h2>
+              <ul>
+                {collabNames}
+              </ul>
               <form className = "well">
                 <h3 className = "title"> Users To Share With </h3>
                 <FormLine name = "Email" type = "text" value = {this.state.email} onChange={(e)=> this.setState({
