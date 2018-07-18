@@ -177,48 +177,13 @@ export default class TextBox extends React.Component {
     const { editorState } = this.state;
     const raw = convertToRaw(editorState.getCurrentContent());
 
-
-    // const regex = new RegExp(search, 'g');
-    // _.each(raw.blocks, (block) => {
-    //   let match;
-    //     while ((match = block.text.match(regex)) !== null) {
-    //       if (match && match.length > 0) {
-    //         const mLen = match[0].length;
-    //         console.log(match);
-    //         let checked = false;
-    //         for (let j = 0; j < block.inlineStyleRanges.length; j++) {
-    //           if (block.inlineStyleRanges[j].style === 'highlighted' &&
-    //            block.inlineStyleRanges[j].offset === match.index) {
-    //             block.inlineStyleRanges[j] = {
-    //               offset: match.index,
-    //               length: mLen,
-    //               style: 'highlighted',
-    //             };
-    //             checked = true;
-    //           }
-    //         }
-    //         if (!checked) {
-    //           block.inlineStyleRanges.push({
-    //             offset: match.index,
-    //             length: mLen,
-    //             style: 'highlighted',
-    //           });
-    //         }
-    //       } else {
-    //         block.inlineStyleRanges = block.inlineStyleRanges.filter(style =>
-    //               (!style.style === 'highlighted'));
-    //       }
-    //     }
-    // });
-
-
-    const regex = new RegExp(search);
+    const regex = new RegExp(search, 'g');
     _.each(raw.blocks, (block) => {
-      // for (let i = 0; i < block.text.length; i ++) {
-        const match = block.text.match(regex);
-        if (match && match.length > 0) {
+      let match;
+      const text = block.text
+      while ((match = regex.exec(text)) != null) {
+        if (match) {
           const mLen = match[0].length;
-          console.log(match);
           let checked = false;
           for (let j = 0; j < block.inlineStyleRanges.length; j++) {
             if (block.inlineStyleRanges[j].style === 'highlighted' &&
@@ -242,7 +207,7 @@ export default class TextBox extends React.Component {
           block.inlineStyleRanges = block.inlineStyleRanges.filter(style =>
                 (!style.style === 'highlighted'));
         }
-      // }
+      }
     });
 
 
