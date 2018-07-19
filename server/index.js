@@ -164,7 +164,7 @@ app.post('/savenewcollaborator', (req, res) => {
   Project.findById(req.body.projectId)
     .then((project) => {
       const newCollaboratorArr = project.collaborators;
-      if (newCollaboratorArr.indexOf(req.body.newCollaborator) > -1) {
+      if ((newCollaboratorArr.indexOf(req.body.newCollaborator) > -1) || (project.owner == req.body.newCollaborator)) {
         res.json({ status: 202, message: 'User is already added'})
       } else {
         newCollaboratorArr.push(req.body.newCollaborator);
