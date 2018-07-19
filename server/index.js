@@ -12,6 +12,8 @@ const User = require('./models').User;
 
 const Project = require('./models').Project;
 
+const dateformat = require('dateformat')
+
 // socket setup
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
@@ -241,22 +243,32 @@ app.get('/getAllEditors/:docId', (req, res) => {
 app.post('/saveContent/:docId', (req, res) => {
   Project.findById(req.params.docId)
   .then((version) => {
-    let existing;
+    let existing = false;
     const newVersionArr = version.versions;
-    newVersionArr.forEach(newVersionArr)
-    if ()
-    newVersionArr.push({
-      contents: req.body.content,
-      styles: req.body.style,
-      date: new Date().toISOString(),
-    });
-    Project.findByIdAndUpdate(req.params.docId, {
-      contents: req.body.content,
-      styles: req.body.style,
-      versions: newVersionArr,
-    })
-      .then(res.json({ status: 200, message: 'Saved' }))
-      .catch(err => res.json({ status: `Error: ${err}` }));
+    for (var x = 0; x < newVersionArr.length; x++) {
+      if (newVersionArr[x].contents === req.body.content) {
+        existing = true;
+        res.json({ status: 200, message: 'Version Already Exists'})
+        break;
+      }
+    }
+    if (!existing) {
+      let date = new Date()
+      let formatedDate = dateformat(date, 'mmmm dS, yyyy, h:MM TT')
+      let verNum = newVersionArr.length+1
+      newVersionArr.push({
+        contents: req.body.content,
+        styles: req.body.style,
+        date: 'V' + verNum + ' - ' + formatedDate,
+      });
+      Project.findByIdAndUpdate(req.params.docId, {
+        contents: req.body.content,
+        styles: req.body.style,
+        versions: newVersionArr,
+      })
+        .then(res.json({ status: 200, message: 'Saved' }))
+        .catch(err => res.json({ status: `Error: ${err}` }));
+    }
   });
 });
 

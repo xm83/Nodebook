@@ -6,8 +6,6 @@ import History from './History'
 import Button from './Button';
 import FormLine from './FormLine';
 import TextBox from './TextBox';
-import History from './History';
-import axios from 'axios'
 
 const customStyles = {
   content : {
