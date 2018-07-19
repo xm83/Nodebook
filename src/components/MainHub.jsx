@@ -191,8 +191,17 @@ class MainHub extends React.Component {
       :
       (
         <div>
+          <nav className="navbar navbar-light bg-light">
+            <a class="navbar-brand" href="#">NAME HERE</a>
+              <button type="button" className="btn btn-outline-primary my-2 my-sm-0" onClick = {this.openModal}>Create New Doc</button>
+            <form className="form-inline">
+              <input className="form-control mr-sm-2" aria-label="Search" type="text" placeholder="Search" onChange={(e)=> this.filter(e)}/>
+              <button className="btn btn-outline-primary my-2 my-sm-0" type="submit">Search</button>
+              <button style={{marginLeft: '1vw'}} type="logout" className="btn btn-outline-dark my-2 my-sm-0" onClick = {()=>this.logOut()}>Logout</button>
+              {/* <Button type="Logout" onClick={()=>this.logOut()}/> */}
+            </form>
+          </nav>
           <div>
-            <Button type="Create New Doc" onClick={this.openModal}/>
             <Modal
               isOpen={this.state.modalIsOpen}
               onAfterOpen={this.afterOpenModal}
@@ -211,9 +220,7 @@ class MainHub extends React.Component {
                 </form>
               </Modal>
           </div>
-          <input type="text" placeholder="Search.." onChange={(e)=> this.filter(e)}/>
           {docRender}
-          <Button type="Logout" onClick={()=>this.logOut()}/>
         </div>
       )
     )
