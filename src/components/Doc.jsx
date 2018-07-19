@@ -158,10 +158,19 @@ class Doc extends React.Component {
 
     return (!this.state.versionDisplay ?
       (<div>
+        <nav className="navbar navbar-light bg-light">
+          <div>
+          <a class="navbar-brand" onClick={()=>this.props.goHome()} href="#">NAME HERE</a>
+          </div>
+          <form className="form-inline">
+            {/* <Button type="Version History" onClick={() => this.showVersions()} revert={()=>this.revert()} /> */}
+            <button type="button" className="btn btn-primary my-2 my-sm-0" onClick={() => this.showVersions()} revert={()=>this.revert()}>History</button>
+            <button type="button" className="btn btn-primary my-2 my-sm-0" onClick={this.openModal}>Share</button>
+          </form>
+        </nav>
         <h1> {this.props.doc.title} </h1>
-        <Button type="Home" onClick={()=>this.props.goHome()}/>
+        {/* <Button type="Home" onClick={()=>this.props.goHome()}/> */}
         <div>
-          <Button type="Share" onClick={this.openModal}/>
           <Modal
             isOpen={this.state.modalIsOpen}
             onAfterOpen={this.afterOpenModal}
@@ -185,7 +194,6 @@ class Doc extends React.Component {
         </div>
         <TextBox docId={this.props.doc._id} content={this.props.doc.contents} styles={this.props.doc.styles} socket={this.props.socket}/>
         <Button type="Version History" onClick={() => this.showVersions()} revert={()=>this.revert()} />
-      </div>) :
       (<History doc={this.props.doc} cancel={() => this.cancel()} revert={() => this.revert()}/>)
     )
   }
