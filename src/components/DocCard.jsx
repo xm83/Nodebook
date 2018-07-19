@@ -12,13 +12,17 @@ class DocCard extends React.Component {
 
   render() {
     return (
-      <div className="container">
-      <div className="col-sm-offset-2">
-        <p>{this.props.doc.title}</p>
-        <p> Owner: {this.props.doc.owner.firstName} {this.props.doc.owner.lastName} </p>
-        <p> Collaboraters: {this.props.collabs} </p>
-        <button type="button" className="btn btn-primary button" onClick={()=>this.props.openDoc()}>Open</button>
-        <button style={{marginLeft: '1vw'}} type="button" className="btn btn-danger button" onClick={()=>this.props.deleteDoc()}>Delete</button>
+      <div onClick={()=>this.props.openDoc()} className="text-center d-inline-block" style={{marginTop: '3vh', marginLeft: '1vw', marginRight: '1vw', border: '2px solid black', background: 'white', height: '35vh', width: '15vw'}}>
+      <div style={{flexDirection: 'row'}}>
+        <div style={{fontSize: '30px'}}>
+          <p>{this.props.doc.title}</p>
+        </div>
+        <div>
+          <p style={{color: '#c0c0c0'}}> {this.props.doc.owner.firstName} {this.props.doc.owner.lastName} </p>
+          <p> {this.props.collabs} </p>
+          <p>{this.props.doc.createdAt}</p>
+          <button style={{color: 'grey'}} type="button" className="btn btn-sm btn-link button" onClick={()=>this.props.deleteDoc()}>Delete</button>
+        </div>
       </div>
     </div>
     )

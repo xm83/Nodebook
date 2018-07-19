@@ -140,11 +140,14 @@ app.get('/', (req, res) => {
 });
 
 app.post('/savenewdocument', (req, res) => {
+  let date = new Date();
+  let formattedDate = date.toLocaleDateString();
   const newProject = new Project({
     title: req.body.title,
     owner: req.user._id,
     collaborators: [],
     contents: '',
+    createdAt: formattedDate,
   });
   newProject.save()
     .then(project => res.json({ status: 200, message: 'Created New Project', projectObject: project }))
