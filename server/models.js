@@ -1,8 +1,9 @@
 
-const mongoose = require('mongoose')
-var connect = process.env.MONGODB_URI
+const mongoose = require('mongoose');
 
-mongoose.connect(connect)
+const connect = process.env.MONGODB_URI;
+
+mongoose.connect(connect);
 
 const Schema = mongoose.Schema;
 
@@ -17,22 +18,30 @@ const userSchema = Schema({
 const projectSchema = Schema({
   title: {
     type: String,
-    default: 'Untitled'
+    default: 'Untitled',
   },
   owner: {
     type: Schema.Types.ObjectId,
     required: true,
-    ref: 'User'
+    ref: 'User',
   },
   collaborators: {
     type: [{ type: Schema.Types.ObjectId, ref: 'User' }],
-    default: []
+    default: [],
   },
   contents: String,
   styles: {
     type: String,
-    default: ''
-  }
+    default: '',
+  },
+  createdAt: {
+    type: Date,
+    default: '',
+  },
+  versions: {
+    type: Array,
+    default: [],
+  },
 });
 
 // Convert Schemas to Models
@@ -40,6 +49,6 @@ const User = mongoose.model('User', userSchema);
 const Project = mongoose.model('Project', projectSchema);
 
 module.exports = {
-  User: User,
-  Project: Project,
+  User,
+  Project,
 };

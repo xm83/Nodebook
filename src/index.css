@@ -1,7 +1,18 @@
+html, body {
+  height: 10vh;
+  background: linear-gradient(-225deg, #D7FFFE 0%, #FFFEFF 100%);
+}
+
 .editor {
   border: 2px solid black;
   min-height: 300px;
   padding: 15px;
+}
+.reader {
+  border: 2px solid black;
+  min-height: 300px;
+  padding: 15px;
+  max-width: 300px;
 }
 .text-align-left {
   text-align: left;
@@ -13,4 +24,9 @@
 
 .text-align-center {
   text-align: center;
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
 }

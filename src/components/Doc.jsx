@@ -1,10 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Modal from 'react-modal';
+import axios from 'axios'
+import History from './History'
 import Button from './Button';
 import FormLine from './FormLine';
 import TextBox from './TextBox';
-import axios from 'axios'
 
 const customStyles = {
   content : {
@@ -27,12 +28,30 @@ class Doc extends React.Component {
     this.state = {
       modalIsOpen: false,
       shareUserId: "",
-      email: ""
+      email: "",
+      collaborators: [],
+      versionDisplay: false,
+      reverted: false,
+      newContent: this.props.doc.contents,
+      newStyle: this.props.doc.styles,
     }
 
     this.openModal = this.openModal.bind(this);
     this.afterOpenModal = this.afterOpenModal.bind(this);
     this.closeModal = this.closeModal.bind(this);
+    this.cancel = this.cancel.bind(this);
+  }
+
+  componentDidMount() {
+    axios.post(`http://localhost:1337/populateCollaborators`, {
+      docId: this.props.doc._id
+    })
+    .then((resp) => {
+      this.setState({
+        collaborators: resp.data.collaborators.collaborators,
+        reverted: false,
+      })
+    })
   }
 
 
@@ -60,13 +79,23 @@ class Doc extends React.Component {
         projectId: this.props.doc._id
       })
       .then((resp) => {
-        if (resp.status === 200) {
+        console.log(resp.data)
+        axios.post(`http://localhost:1337/populateCollaborators`, {
+          docId: this.props.doc._id
+        })
+        .then((resp) => {
           this.setState({
-            shareUserId: "",
+            email: "",
+            collaborators: resp.data.collaborators.collaborators
           })
-        }
-        console.log(resp)
-        this.closeModal()
+          if (resp.data.status === 200) {
+            this.closeModal()
+          }
+          if (resp.data.status === 202) {
+
+            alert('This User Already Has Access To The Document')
+          }
+        })
       })
     })
     .catch((err) => {
@@ -74,9 +103,61 @@ class Doc extends React.Component {
     })
   }
 
+  removeColl(id) {
+    axios.post(`http://localhost:1337/removecollaborator`, {
+      projectId: this.props.doc._id,
+      collaboratorToBeRemoved: id
+    })
+    .then((resp) => {
+      console.log(resp)
+      if (resp.data.status === 200) {
+        axios.post(`http://localhost:1337/populateCollaborators`, {
+          docId: this.props.doc._id
+        })
+        .then((resp) => {
+          this.setState({
+            collaborators: resp.data.collaborators.collaborators
+          })
+        })
+      } else {
+        alert(resp.data.message)
+      }
+    })
+  }
+
+  showVersions() {
+    this.setState({
+      versionDisplay: true
+    })
+  }
+
+  revert() {
+    axios.get(`http://localhost:1337/loadproject/` + docId)
+    .then((proj) => {
+      this.setState({
+        openDoc: !this.state.openDoc,
+        loadDoc: proj.data.projectObject
+      })
+    })
+  }
+
+  cancel() {
+    this.setState({
+      versionDisplay: false
+    })
+  }
+
   render(){
-    return (
-      <div>
+    let collabNames = this.state.collaborators.map((collab) => {
+      return (
+        <li>
+          {collab.firstName} {collab.lastName} <Button type="Remove" onClick={() => this.removeColl(collab._id)} />
+        </li>
+      )
+    });
+
+    return (!this.state.versionDisplay ?
+      (<div>
         <h1> {this.props.doc.title} </h1>
         <Button type="Home" onClick={()=>this.props.goHome()}/>
         <div>
@@ -88,7 +169,10 @@ class Doc extends React.Component {
             style={customStyles}
             contentLabel="Share Your Document"
           >
-            <h2 ref={subtitle => this.subtitle = subtitle}> Share Your Document </h2>
+            <h2 ref={subtitle => this.subtitle = subtitle}> Users On This Document </h2>
+              <ul>
+                {collabNames}
+              </ul>
               <form className = "well">
                 <h3 className = "title"> Users To Share With </h3>
                 <FormLine name = "Email" type = "text" value = {this.state.email} onChange={(e)=> this.setState({
@@ -99,9 +183,10 @@ class Doc extends React.Component {
               </form>
             </Modal>
         </div>
-        {/* pass socket to TextBox loaded based on docId */}
         <TextBox docId={this.props.doc._id} content={this.props.doc.contents} styles={this.props.doc.styles} socket={this.props.socket}/>
-      </div>
+        <Button type="Version History" onClick={() => this.showVersions()} revert={()=>this.revert()} />
+      </div>) :
+      (<History doc={this.props.doc} cancel={() => this.cancel()} revert={() => this.revert()}/>)
     )
   }
 }

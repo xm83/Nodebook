@@ -60,7 +60,10 @@ class Signup extends Component {
 
   render() {
     return (
-      <form className="well">
+      <div>
+        <div className="text-right" style={{paddingRight: '5vh', paddingTop: '5vh', paddingBottom: '3vh'}}><Button type = "Return To Login" onClick={()=>this.props.toggleReg()}/></div>
+      <center>
+        <form style={{paddingTop: '3vh'}} className="well">
         <h3 className="title"> Sign up </h3>
         <h2>{this.state.msg}</h2>
         <FormLine name = "FirstName" type = "text" value = {this.state.firstName} onChange={(e)=> this.setState({
@@ -79,8 +82,9 @@ class Signup extends Component {
           confirmPword: e.target.value
         })}/>
         <Button type = "Submit" onClick={()=>this.Submit()}/>
-        <Button type = "Return To Login" onClick={()=>this.props.toggleReg()}/>
       </form>
+    </center>
+    </div>
     );
   }
 }

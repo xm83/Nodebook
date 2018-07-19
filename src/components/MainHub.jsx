@@ -19,6 +19,8 @@ const customStyles = {
   }
 };
 
+let docCards
+
 Modal.setAppElement('#App')
 
 //This Component Brings the User to the Main Hub of the page, where he/she can see all
@@ -88,7 +90,8 @@ class MainHub extends React.Component {
         if (resp.status === 200) {
           this.setState({
             openDoc: true,
-            loadDoc: resp.data.projectObject
+            loadDoc: resp.data.projectObject,
+            newDoc: ""
           })
         }
       })
@@ -103,7 +106,7 @@ class MainHub extends React.Component {
     .then((resp) => {
       console.log('frontend', resp.data)
       this.setState({
-        documents: resp.data.projectObjects,
+        filteredDocuments: resp.data.projectObjects,
         openDoc: false,
       });
       this.closeModal()
@@ -131,10 +134,25 @@ class MainHub extends React.Component {
   openDoc(docId) {
     axios.get(`http://localhost:1337/loadproject/` + docId)
     .then((proj) => {
-      console.log(proj.data)
       this.setState({
         openDoc: !this.state.openDoc,
         loadDoc: proj.data.projectObject
+      })
+    })
+    .catch((err) => {
+      console.log(err)
+    })
+  }
+
+  //NOT WORKING PROPERLY. DELETES< BUT THE RE-RENDER IS FUCKING UP
+  deleteDoc(docId) {
+    axios.post(`http://localhost:1337/deletedoc`, {
+      docId: docId,
+      userId: this.state.currUser._id
+    })
+    .then((resp) => {
+      this.setState({
+        filteredDocuments: resp.data.projectObjects
       })
     })
     .catch((err) => {
@@ -147,10 +165,26 @@ class MainHub extends React.Component {
     this.props.logOut()
   }
 
+  // reRenderDocCards() {
+  //   if (this.state.filteredDocuments) {
+  //     docRender = this.state.filteredDocuments.map((doc, i) => <DocCard key={i} doc={doc} deleteDoc={()=>this.deleteDoc(doc._id)} openDoc={()=>this.openDoc(doc._id)} /> )
+  //   }
+  // }
+
   render() {
     let docRender;
     if (this.state.filteredDocuments) {
-      docRender = this.state.filteredDocuments.map((doc, i) => <DocCard key={i} user={this.state.currUser} doc={doc} openDoc={()=>this.openDoc(doc._id)} /> )
+      docRender = this.state.filteredDocuments.map((doc, i) => {
+        let collabNames = "";
+        for (var x = 0; x < doc.collaborators.length; x++) {
+          if (x === doc.collaborators.length-1) {
+              collabNames += (doc.collaborators[x].firstName + ' ' + doc.collaborators[x].lastName)
+          } else {
+            collabNames += (doc.collaborators[x].firstName + ' ' + doc.collaborators[x].lastName + ', ')
+          }
+        }
+        return <DocCard collabs={collabNames} key={i} doc={doc} deleteDoc={()=>this.deleteDoc(doc._id)} openDoc={()=>this.openDoc(doc._id)} />
+      })
     }
     return (this.state.openDoc ?
       // pass socket to Doc, which will render TextBox
@@ -158,8 +192,19 @@ class MainHub extends React.Component {
       :
       (
         <div>
+          <nav className="navbar navbar-light bg-light">
+            <div>
+            <a class="navbar-brand" href="#">NAME HERE</a>
+              <button style={{marginLeft: '1vw'}} type="button" className="btn btn-outline-primary my-2 my-sm-0" onClick = {this.openModal}>Create New Doc</button>
+            </div>
+            <form className="form-inline">
+              <input className="form-control mr-sm-2" aria-label="Search" type="text" placeholder="Search" onChange={(e)=> this.filter(e)}/>
+              <button className="btn btn-outline-primary my-2 my-sm-0" type="submit">Search</button>
+              <button style={{marginLeft: '1vw'}} type="logout" className="btn btn-outline-dark my-2 my-sm-0" onClick = {()=>this.logOut()}>Logout</button>
+              {/* <Button type="Logout" onClick={()=>this.logOut()}/> */}
+            </form>
+          </nav>
           <div>
-            <Button type="Create New Doc" onClick={this.openModal}/>
             <Modal
               isOpen={this.state.modalIsOpen}
               onAfterOpen={this.afterOpenModal}
@@ -178,9 +223,9 @@ class MainHub extends React.Component {
                 </form>
               </Modal>
           </div>
-          <input type="text" placeholder="Search.." onChange={(e)=> this.filter(e)}/>
+          <div className="container" style={{display: 'flex', flexDirection:'row', flexWrap: 'wrap'}}>
           {docRender}
-          <Button type="Logout" onClick={()=>this.logOut()}/>
+        </div>
         </div>
       )
     )

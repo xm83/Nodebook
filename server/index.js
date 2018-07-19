@@ -27,6 +27,8 @@ io.on('connection', (socket) => {
 
 });
 
+const dateformat = require('dateformat')
+
 mongoose.connect(process.env.MONGODB_URI);
 
 
@@ -65,7 +67,7 @@ passport.use(new LocalStrategy((email, password, done) => {
   // hash password
   const hash = hashPassword(password);
   // first try local strategy
-  User.findOne({ email: email }, (err, user) => {
+  User.findOne({ email }, (err, user) => {
     if (err) {
       console.log('error: ', err);
       return done(err);
@@ -82,11 +84,11 @@ passport.use(new LocalStrategy((email, password, done) => {
 }));
 
 passport.serializeUser((user, done) => {
-  //console.log('serialize user:', user);
+  // console.log('serialize user:', user);
   done(null, user._id); // does this need the '_', could it just be .id?
 });
 passport.deserializeUser((userId, done) => {
-  //console.log('deserialize id:', userId);
+  // console.log('deserialize id:', userId);
   User.findById(userId, (err, user) => {
     if (err) {
       done(err);
@@ -96,13 +98,13 @@ passport.deserializeUser((userId, done) => {
   });
 });
 
-app.get('/currentUser', (req, res)  => {
+app.get('/currentUser', (req, res) => {
   if (!req.user) {
-    console.log('error')
+    console.log('error');
   } else {
-    res.send(req.user)
+    res.send(req.user);
   }
-})
+});
 
 app.post('/login', passport.authenticate('local'), (req, res) => {
   res.redirect('/');
@@ -142,46 +144,72 @@ app.use('/*', (req, res, next) => {
 
 app.get('/', (req, res) => {
   User.findById(req.user.id)
-  .then(user => res.json({ status: 200, message: 'user logged in!', user: user}))
-  .catch(err => res.json({status: `Error: ${err}`}))
-})
+  .then(user => res.json({ status: 200, message: 'user logged in!', user }))
+  .catch(err => res.json({ status: `Error: ${err}` }));
+});
 
 app.post('/savenewdocument', (req, res) => {
+  let date = new Date();
+  let formattedDate = date.toLocaleDateString();
   const newProject = new Project({
     title: req.body.title,
     owner: req.user._id,
     collaborators: [],
     contents: '',
+    createdAt: formattedDate,
   });
   newProject.save()
     .then(project => res.json({ status: 200, message: 'Created New Project', projectObject: project }))
     .catch(err => res.json({ status: `Error: ${err}` }));
 });
 
+//Manny's Clean Code
+app.post('/deletedoc', async (req, res) => {
+  const project = await Project.findById(req.body.docId);
+  if (req.body.userId == project.owner) {
+    var deleted = await Project.findByIdAndDelete(req.body.docId)
+    res.redirect('/loaduserprojects/')
+  }
+})
 // Might Have to Move the .then and .catch
 app.post('/savenewcollaborator', (req, res) => {
-  console.log(req.body)
   Project.findById(req.body.projectId)
     .then((project) => {
       const newCollaboratorArr = project.collaborators;
-      newCollaboratorArr.push(req.body.newCollaborator);
-      Project.findByIdAndUpdate(project.id, { collaborators: newCollaboratorArr })
-      .then(res.json({ status: 200, message: 'Successfully Added Collaborator' }))
-      .catch(err => res.json({ status: `Error: ${err}` }));
-    });
+      if ((newCollaboratorArr.indexOf(req.body.newCollaborator) > -1) || (project.owner == req.body.newCollaborator)) {
+        res.json({ status: 202, message: 'User is already added'})
+      } else {
+        newCollaboratorArr.push(req.body.newCollaborator);
+        Project.findByIdAndUpdate(project.id, { collaborators: newCollaboratorArr })
+        .then(res.json({ status: 200, message: 'Successfully Added Collaborator', collaborators: newCollaboratorArr }))
+      }
+    })
+    .catch(err => res.json({ status: `Error: ${err}` }));
 });
 
+app.post('/populateCollaborators', (req,res) => {
+  Project.findById(req.body.docId)
+  .populate('collaborators')
+  .exec()
+  .then((populatedProjects) => res.json({ status: 200, message: 'Populated Collaborators', collaborators: populatedProjects }))
+})
 // Might Have to Move the .then and .catch
 app.post('/removecollaborator', (req, res) => {
   Project.findById(req.body.projectId)
     .exec()
     .then((project) => {
-      const newCollaboratorArr = project.collaborators;
-      newCollaboratorArr.splice(newCollaboratorArr.indexOf(req.body.collaboratorToBeRemoved), 1);
-      Project.findByIdAndUpdate(project.id, { collaborators: newCollaboratorArr })
-      .then(res.json({ status: 200, message: 'Successfully Added Collaborator' }))
-      .catch(err => res.json({ status: `Error: ${err}` }));
-    });
+      if (req.user._id === project.owner) {
+        const newCollaboratorArr = project.collaborators;
+        newCollaboratorArr.splice(newCollaboratorArr.indexOf(req.body.collaboratorToBeRemoved), 1);
+        Project.findByIdAndUpdate(project.id, { collaborators: newCollaboratorArr })
+        .populate('collaborators')
+        .then(res.json({ status: 200, message: 'Successfully Remove Collaborator', collaborators: newCollaboratorArr}))
+      } else {
+        res.json({status: 202, message: 'Sorry, You Do Not Have Permission'})
+      }
+
+    })
+    .catch(err => res.json({ status: `Error: ${err}` }));
 });
 
 app.get('/loaduserprojects/', (req, res) => {
@@ -189,6 +217,9 @@ app.get('/loaduserprojects/', (req, res) => {
     { collaborators: { $in: [req.user._id] } },
     { owner: { $eq: req.user._id } },
   ] })
+    .populate('owner')
+    .populate('collaborators')
+    .exec()
     .then(userProjects => res.json({ status: 200, message: 'Successfully Loaded Projects', projectObjects: userProjects }))
     .catch(err => res.json({ status: `Error: ${err}` }));
 });
@@ -201,10 +232,10 @@ app.get('/loadproject/:documentid', (req, res) => {
 });
 
 app.get('/findUser/:userEmail', (req, res) => {
-  User.findOne({email: req.params.userEmail})
-  .then(user => res.json({ status: 200, message: 'Successfully Shared', shareUser: user}))
-  .catch(err => res.json({status: `Error: ${err}`}))
-})
+  User.findOne({ email: req.params.userEmail })
+  .then(user => res.json({ status: 200, message: 'Successfully Shared', shareUser: user }))
+  .catch(err => res.json({ status: `Error: ${err}` }));
+});
 
 app.get('/getAllEditors/:docId', (req, res) => {
   Project.findById(req.params.docId)
@@ -212,22 +243,49 @@ app.get('/getAllEditors/:docId', (req, res) => {
   .populate('collaborators')
   .exec((err, project) => {
     if (err) {
-      console.log("error", err);
+      console.log('error', err);
     } else {
-      res.json({project: project})
+      res.json({ project });
     }
-  })
-})
+  });
+});
 
 app.post('/saveContent/:docId', (req, res) => {
-  Project.findByIdAndUpdate(req.params.docId, {contents: req.body.content, styles: req.body.style})
-  .then((content) => res.json({status: 200, message: 'Saved'}))
+  Project.findById(req.params.docId)
+  .then((version) => {
+    let existing = false;
+    const newVersionArr = version.versions;
+    for (var x = 0; x < newVersionArr.length; x++) {
+      if (newVersionArr[x].contents === req.body.content) {
+        existing = true;
+        res.json({ status: 200, message: 'Version Already Exists'})
+        break;
+      }
+    }
+    if (!existing) {
+      let date = new Date()
+      let formatedDate = dateformat(date, 'mmmm dS, yyyy, h:MM TT')
+      let verNum = newVersionArr.length+1
+      newVersionArr.push({
+        contents: req.body.content,
+        styles: req.body.style,
+        date: 'V' + verNum + ' - ' + formatedDate,
+      });
+      Project.findByIdAndUpdate(req.params.docId, {
+        contents: req.body.content,
+        styles: req.body.style,
+        versions: newVersionArr,
+      })
+        .then(res.json({ status: 200, message: 'Saved' }))
+        .catch(err => res.json({ status: `Error: ${err}` }));
+    }
+  });
+});
 
-})
-
-app.get('/logout', function(req, res) {
-  req.logout();
-})
+app.get('/logout', (req) => {
+  req.session.destroy()
+  // req.logout();
+});
 
 // socket setup on this port
 server.listen(process.env.port || 1337, () => { console.log('listening on port 1337') });
