@@ -227,11 +227,7 @@ export default class TextBox extends React.Component {
             value={this.state.search}
             placeholder="Search"
             onChange={(e) => { this.search(e.target.value); }}
-          /><button onClick={() => {
-            if (this.state.search) {
-              this.regex();
-            }
-          }}>RegEx</button> <br />
+          /><button onClick={() => { this.regex(); }}>RegEx</button> <br />
           {blockStyles.map(({ style, title }) =>
           (<button key={title} onClick={() => { this.block(style); }}>{title}</button>))}
           <br />

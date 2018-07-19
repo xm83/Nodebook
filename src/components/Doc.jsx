@@ -32,9 +32,8 @@ class Doc extends React.Component {
       collaborators: [],
       versionDisplay: false,
       reverted: false,
-
-
-
+      newContent: this.props.doc.contents,
+      newStyle: this.props.doc.styles,
     }
 
     this.openModal = this.openModal.bind(this);
@@ -131,6 +130,16 @@ class Doc extends React.Component {
     })
   }
 
+  revert() {
+    axios.get(`http://localhost:1337/loadproject/` + docId)
+    .then((proj) => {
+      this.setState({
+        openDoc: !this.state.openDoc,
+        loadDoc: proj.data.projectObject
+      })
+    })
+  }
+
   cancel() {
     this.setState({
       versionDisplay: false
@@ -174,9 +183,9 @@ class Doc extends React.Component {
             </Modal>
         </div>
         <TextBox docId={this.props.doc._id} content={this.props.doc.contents} styles={this.props.doc.styles}/>
-        <Button type="Version History" onClick={() => this.showVersions()} />
+        <Button type="Version History" onClick={() => this.showVersions()} revert={()=>this.revert()} />
       </div>) :
-      (<History doc={this.props.doc} cancel={() => this.cancel()} />)
+      (<History doc={this.props.doc} cancel={() => this.cancel()} revert={() => this.revert()}/>)
     )
   }
 }
