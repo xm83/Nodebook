@@ -12,13 +12,15 @@ class DocCard extends React.Component {
 
   render() {
     return (
-      <div>
+      <div className="container">
+      <div className="col-sm-offset-2">
         <p>{this.props.doc.title}</p>
         <p> Owner: {this.props.doc.owner.firstName} {this.props.doc.owner.lastName} </p>
         <p> Collaboraters: {this.props.collabs} </p>
-        <Button type="Open" onClick={()=>this.props.openDoc()} />
-        <Button type="Delete" onClick={()=>this.props.deleteDoc()} />
+        <button type="button" className="btn btn-primary button" onClick={()=>this.props.openDoc()}>Open</button>
+        <button style={{marginLeft: '1vw'}} type="button" className="btn btn-danger button" onClick={()=>this.props.deleteDoc()}>Delete</button>
       </div>
+    </div>
     )
   }
 

@@ -1,3 +1,8 @@
+html, body {
+  height: 10vh;
+  background: linear-gradient(-225deg, #D7FFFE 0%, #FFFEFF 100%);
+}
+
 .editor {
   border: 2px solid black;
   min-height: 300px;

@@ -50,19 +50,19 @@ class LoginBlock extends React.Component {
 
  render(){
    return (
-      <div>
-        <div className="text-right" style={{paddingRight: '10px'}}><Button type = "Register" onClick={()=>this.props.toggleReg()}/></div>
-        <form className = "well">
-          <h3 className = "title"> Login </h3>
+      <div >
+        <form style={{paddingTop: '3vh'}} className = "well">
+          <h3 className="title"> Login </h3>
           <h2>{this.state.msg}</h2>
-          <FormLine name = "Email" type = "text" value = {this.state.email} onChange={(e)=> this.setState({
+          <FormLine name="Email" type="text" value={this.state.email} onChange={(e)=> this.setState({
             email: e.target.value
           })}/>
-          <FormLine name = "Password" type = "password" value = {this.state.pword} onChange={(e)=> this.setState({
+          <FormLine name="Password" type="password" value={this.state.pword} onChange={(e)=> this.setState({
             pword: e.target.value
           })}/>
-          <Button type = "Login" onClick={()=>this.login()}/>
+          <Button type="Login" onClick={()=>this.login()}/>
         </form>
+        <div style={{paddingTop: '3vh'}}><button style={{ color: 'grey' }} type="button" className="btn btn-link btn-sm" onClick={()=>this.props.toggleReg()}>New user? Click here to register.</button></div>
       </div>
     );
   }
