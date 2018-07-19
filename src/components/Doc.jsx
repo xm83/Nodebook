@@ -32,6 +32,9 @@ class Doc extends React.Component {
       collaborators: [],
       versionDisplay: false,
       reverted: false,
+
+
+
     }
 
     this.openModal = this.openModal.bind(this);
@@ -51,7 +54,6 @@ class Doc extends React.Component {
       })
     })
   }
-
 
   openModal = () => {
     this.setState({modalIsOpen: true});
