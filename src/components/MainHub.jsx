@@ -7,6 +7,7 @@ import Doc from './Doc';
 import axios from 'axios'
 import DocCard from './DocCard'
 import { ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap'
+import { Draggable, Droppable } from 'react-drag-and-drop';
 
 const customStyles = {
   content : {
@@ -37,7 +38,8 @@ class MainHub extends React.Component {
       search: "",
       filteredDocuments: [],
       currUser: "",
-      loadDoc: ""
+      loadDoc: "",
+      idBeingDeleted: "",
     }
 
     this.openDoc= this.openDoc.bind(this)
@@ -121,11 +123,22 @@ class MainHub extends React.Component {
     this.setState({
       search: e.target.value
     })
-    console.log(e.target.value)
     let allDocs = this.state.documents.slice();
-
-    console.log(allDocs)
-    let filtDocs = allDocs.filter(doc => doc.title.includes(e.target.value))
+    let filtDocs = []
+    allDocs.map(doc => {
+      for (var x = 0; x < doc.collaborators.length; x++) {
+        if (doc.collaborators[x].firstName.toLowerCase().includes(e.target.value.toLowerCase()) ||
+            doc.collaborators[x].lastName.toLowerCase().includes(e.target.value.toLowerCase()) ||
+           (doc.collaborators[x].firstName.toLowerCase() + ' ' + doc.collaborators[x].lastName.toLowerCase()).includes(e.target.value.toLowerCase())) {
+          filtDocs.push(doc)
+        }
+      }
+      if (!filtDocs.includes(doc) && (doc.title.toLowerCase().includes(e.target.value.toLowerCase()) ||
+          doc.owner.firstName.toLowerCase().includes(e.target.value.toLowerCase()) ||
+          doc.owner.lastName.toLowerCase().includes(e.target.value.toLowerCase()))) {
+        filtDocs.push(doc)
+      }
+    })
     this.setState({
       filteredDocuments: filtDocs
     })
@@ -144,7 +157,6 @@ class MainHub extends React.Component {
     })
   }
 
-  //NOT WORKING PROPERLY. DELETES< BUT THE RE-RENDER IS FUCKING UP
   deleteDoc(docId) {
     axios.post(`http://localhost:1337/deletedoc`, {
       docId: docId,
@@ -165,11 +177,16 @@ class MainHub extends React.Component {
     this.props.logOut()
   }
 
-  // reRenderDocCards() {
-  //   if (this.state.filteredDocuments) {
-  //     docRender = this.state.filteredDocuments.map((doc, i) => <DocCard key={i} doc={doc} deleteDoc={()=>this.deleteDoc(doc._id)} openDoc={()=>this.openDoc(doc._id)} /> )
-  //   }
-  // }
+
+  sendData(docId) {
+    this.setState({
+      idBeingDeleted: docId
+    })
+  }
+
+  onDrop() {
+    this.deleteDoc(this.state.idBeingDeleted)
+  }
 
   render() {
     let docRender;
@@ -183,7 +200,7 @@ class MainHub extends React.Component {
             collabNames += (doc.collaborators[x].firstName + ' ' + doc.collaborators[x].lastName + ', ')
           }
         }
-        return <DocCard collabs={collabNames} key={i} doc={doc} deleteDoc={()=>this.deleteDoc(doc._id)} openDoc={()=>this.openDoc(doc._id)} />
+        return <DocCard sendData={()=>this.sendData(doc._id)} collabs={collabNames} key={i} doc={doc} deleteDoc={()=>this.deleteDoc(doc._id)} openDoc={()=>this.openDoc(doc._id)} />
       })
     }
     return (this.state.openDoc ?
@@ -224,6 +241,12 @@ class MainHub extends React.Component {
           <div className="container" style={{display: 'flex', flexDirection:'row', flexWrap: 'wrap'}}>
           {docRender}
         </div>
+
+          <Droppable
+            type={['document']}
+            onDrop={this.onDrop.bind(this)}>
+            <p> Drop Me Here </p>
+          </Droppable>
         </div>
       )
     )
