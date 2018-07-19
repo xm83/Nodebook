@@ -194,6 +194,7 @@ class Doc extends React.Component {
         </div>
         <TextBox docId={this.props.doc._id} content={this.props.doc.contents} styles={this.props.doc.styles} socket={this.props.socket}/>
         <Button type="Version History" onClick={() => this.showVersions()} revert={()=>this.revert()} />
+        </div>) :
       (<History doc={this.props.doc} cancel={() => this.cancel()} revert={() => this.revert()}/>)
     )
   }
