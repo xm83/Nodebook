@@ -191,7 +191,7 @@ app.post('/removecollaborator', (req, res) => {
   Project.findById(req.body.projectId)
     .exec()
     .then((project) => {
-      if (req.user._id === project.owner) {
+      if (String(req.user._id) === String(project.owner)) {
         const newCollaboratorArr = project.collaborators;
         newCollaboratorArr.splice(newCollaboratorArr.indexOf(req.body.collaboratorToBeRemoved), 1);
         Project.findByIdAndUpdate(project.id, { collaborators: newCollaboratorArr })

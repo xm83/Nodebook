@@ -121,11 +121,20 @@ class MainHub extends React.Component {
     this.setState({
       search: e.target.value
     })
-    console.log(e.target.value)
     let allDocs = this.state.documents.slice();
-
-    console.log(allDocs)
-    let filtDocs = allDocs.filter(doc => doc.title.includes(e.target.value))
+    let filtDocs = []
+    allDocs.map(doc => {
+      for (var x = 0; x < doc.collaborators.length; x++) {
+        if (doc.collaborators[x].firstName.toLowerCase().includes(e.target.value.toLowerCase()) || doc.collaborators[x].lastName.toLowerCase().includes(e.target.value.toLowerCase())) {
+          filtDocs.push(doc)
+        }
+      }
+      if (!filtDocs.includes(doc) && (doc.title.toLowerCase().includes(e.target.value.toLowerCase()) ||
+          doc.owner.firstName.toLowerCase().includes(e.target.value.toLowerCase()) ||
+          doc.owner.lastName.toLowerCase().includes(e.target.value.toLowerCase()))) {
+        filtDocs.push(doc)
+      }
+    })
     this.setState({
       filteredDocuments: filtDocs
     })
