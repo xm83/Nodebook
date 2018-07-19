@@ -31,3 +31,12 @@ html, body {
   display: flex;
   flex-direction: row;
 }
+
+.doc-card{
+  border: 1px solid grey;
+}
+
+.doc-card:hover {
+  border-color: blue;
+  cursor: pointer;
+}
