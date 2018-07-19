@@ -131,8 +131,12 @@ class Doc extends React.Component {
   }
 
   revert() {
-    this.setState({
-      versionDisplay: false
+    axios.get(`http://localhost:1337/loadproject/` + docId)
+    .then((proj) => {
+      this.setState({
+        openDoc: !this.state.openDoc,
+        loadDoc: proj.data.projectObject
+      })
     })
   }
 
