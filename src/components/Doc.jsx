@@ -1,6 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Modal from 'react-modal';
+import axios from 'axios'
+import History from './History'
 import Button from './Button';
 import FormLine from './FormLine';
 import TextBox from './TextBox';
@@ -39,6 +41,7 @@ class Doc extends React.Component {
     this.openModal = this.openModal.bind(this);
     this.afterOpenModal = this.afterOpenModal.bind(this);
     this.closeModal = this.closeModal.bind(this);
+    this.cancel = this.cancel.bind(this);
   }
 
   componentDidMount() {
@@ -52,7 +55,6 @@ class Doc extends React.Component {
       })
     })
   }
-
 
   openModal = () => {
     this.setState({modalIsOpen: true});

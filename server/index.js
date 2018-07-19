@@ -241,7 +241,10 @@ app.get('/getAllEditors/:docId', (req, res) => {
 app.post('/saveContent/:docId', (req, res) => {
   Project.findById(req.params.docId)
   .then((version) => {
+    let existing;
     const newVersionArr = version.versions;
+    newVersionArr.forEach(newVersionArr)
+    if ()
     newVersionArr.push({
       contents: req.body.content,
       styles: req.body.style,
