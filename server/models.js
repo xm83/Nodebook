@@ -34,6 +34,10 @@ const projectSchema = Schema({
     type: String,
     default: '',
   },
+  createdAt: {
+    type: Date,
+    default: '',
+  },
   versions: {
     type: Array,
     default: [],

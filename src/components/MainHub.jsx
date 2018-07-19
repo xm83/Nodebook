@@ -192,8 +192,10 @@ class MainHub extends React.Component {
       (
         <div>
           <nav className="navbar navbar-light bg-light">
+            <div>
             <a class="navbar-brand" href="#">NAME HERE</a>
-              <button type="button" className="btn btn-outline-primary my-2 my-sm-0" onClick = {this.openModal}>Create New Doc</button>
+              <button style={{marginLeft: '1vw'}} type="button" className="btn btn-outline-primary my-2 my-sm-0" onClick = {this.openModal}>Create New Doc</button>
+            </div>
             <form className="form-inline">
               <input className="form-control mr-sm-2" aria-label="Search" type="text" placeholder="Search" onChange={(e)=> this.filter(e)}/>
               <button className="btn btn-outline-primary my-2 my-sm-0" type="submit">Search</button>
@@ -220,7 +222,9 @@ class MainHub extends React.Component {
                 </form>
               </Modal>
           </div>
+          <div className="container" style={{display: 'flex', flexDirection:'row', flexWrap: 'wrap'}}>
           {docRender}
+        </div>
         </div>
       )
     )
