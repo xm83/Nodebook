@@ -190,7 +190,7 @@ class MainHub extends React.Component {
       (<Doc doc={this.state.loadDoc} id={this.state.currUser} goHome={() => this.goHome()} />)
       :
       (
-        <div>
+        <div style={{background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)'}}>
           <nav className="navbar navbar-light bg-light">
             <div>
             <a class="navbar-brand" href="#">NAME HERE</a>
@@ -198,9 +198,7 @@ class MainHub extends React.Component {
             </div>
             <form className="form-inline">
               <input className="form-control mr-sm-2" aria-label="Search" type="text" placeholder="Search" onChange={(e)=> this.filter(e)}/>
-              <button className="btn btn-outline-primary my-2 my-sm-0" type="submit">Search</button>
               <button style={{marginLeft: '1vw'}} type="logout" className="btn btn-outline-dark my-2 my-sm-0" onClick = {()=>this.logOut()}>Logout</button>
-              {/* <Button type="Logout" onClick={()=>this.logOut()}/> */}
             </form>
           </nav>
           <div>
