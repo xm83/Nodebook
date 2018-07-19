@@ -38,13 +38,41 @@ export default class TextBox extends React.Component {
       interval: '',
       autoSave: false,
       search: '',
-    };
-    this.onChange = (editorState) => {
-      this.setState({ editorState });
+      pending: false
     };
   }
 
   componentDidMount() {
+    const socket = this.props.socket;
+    // open document and start listening for changes to the document
+    socket.emit('openDocument', {
+      docId: this.props.docId
+    }, (res) => {
+      if (res.err) {
+        console.log("res.err", res.err);
+        return alert("error");
+      } else {
+        console.log("success with openDocument", res);
+        // // save response to this.state
+        // this.setState({
+        //   doc: res.doc
+        // })
+        console.log("res.doc", res.doc);
+        console.log("res.doc.rawState:", res.doc.rawState);
+        // if there is rawState, set current editorState to rawState
+        res.doc.rawState && this.setState({
+          editorState: EditorState.createWithContent(convertFromRaw(res.doc.rawState)),
+          styleMap: JSON.parse(res.doc.rawStyle)
+        });
+        // start watching the document to sync live edits
+        socket.on('syncDocument',this.remoteStateChange)
+      }
+    })
+
+
+
+
+    // save document every 30 seconds
     let intervalId = setInterval(() => this.save(), 30000);
     if (this.props.content) {
       const text = convertFromRaw(JSON.parse(this.props.content))
@@ -59,8 +87,46 @@ export default class TextBox extends React.Component {
     });
   }
 
+  // track what the user is changing
+  onChange = (editorState) => {
+    console.log('this.state.pending', this.state.pending)
+    const socket = this.props.socket;
+    if (!this.state.pending) {
+      this.setState({
+        editorState,
+        pending: true
+      }, () => {
+        this.props.socket.emit('syncDocument', {
+          docId: this.props.docId,
+          rawState: convertToRaw(editorState.getCurrentContent()),
+          rawStyle: JSON.stringify(this.state.styleMap) 
+        });
+      })
+    }
+  }
+
+  // sync remote document edits to our editor
+  remoteStateChange = (res) => {
+    console.log("res", res);
+    let update = EditorState.createWithContent(convertFromRaw(res.rawState))
+    let update2 = EditorState.forceSelection(update, this.state.editorState.getSelection())
+
+    this.setState({
+      editorState: update2,
+      styleMap: JSON.parse(res.rawStyle),
+      pending: false
+    });
+  }
+
   componentWillUnmount() {
+    const socket = this.props.socket;
+    // stop saving document
     clearInterval(this.state.interval);
+    // clear up listeners
+    socket.off('syncDocument');
+    socket.emit('closeDocument', {
+      docId: this.props.docId
+    })
   }
 
   inline(inline) {
@@ -89,6 +155,10 @@ export default class TextBox extends React.Component {
               (contentState, style) => Modifier.removeInlineStyle(contentState, selection, style),
               editorState.getCurrentContent(),
           );
+    delete this.state.styleMap.BOLD;
+    delete this.state.styleMap.UNDERLINE;
+    delete this.state.styleMap.ITALIC;
+    delete this.state.styleMap.CODE;
     const newEditorState = EditorState.push(
             editorState,
             clearContentState,
@@ -197,6 +267,8 @@ export default class TextBox extends React.Component {
           }}
           >Default</button>
           <input
+            ref={input => { this.fontSelect = input }}
+            onClick={() => {this.fontSelect.focus()}}
             onKeyPress={(e) => {
               if (e.key === 'Enter') {
                 this.state.styleMap[String(e.target.value)] = { fontSize: e.target.value };
@@ -218,7 +290,7 @@ export default class TextBox extends React.Component {
               this.inline(String(color.hex));
             }}
           />
-        </div>
+        </div> 
         <div className="editor">
           <Editor
             blockStyleFn={getBlockStyle}

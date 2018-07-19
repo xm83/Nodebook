@@ -35,6 +35,7 @@ class Doc extends React.Component {
     this.closeModal = this.closeModal.bind(this);
   }
 
+
   openModal = () => {
     this.setState({modalIsOpen: true});
   }
@@ -98,7 +99,8 @@ class Doc extends React.Component {
               </form>
             </Modal>
         </div>
-        <TextBox docId={this.props.doc._id} content={this.props.doc.contents} styles={this.props.doc.styles}/>
+        {/* pass socket to TextBox loaded based on docId */}
+        <TextBox docId={this.props.doc._id} content={this.props.doc.contents} styles={this.props.doc.styles} socket={this.props.socket}/>
       </div>
     )
   }

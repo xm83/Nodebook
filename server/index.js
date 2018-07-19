@@ -1,24 +1,31 @@
-const express = require('express');
-
 const bodyParser = require('body-parser');
-
 const path = require('path');
 
-const app = express();
-
+// mongoose
 const mongoose = require('mongoose');
-
 const User = require('./models').User;
-
 const Project = require('./models').Project;
 
-//socket setup
-const http = require('http').Server(app);
-const io = require('socket.io')(http);
+// socket setup
+const express = require('express');
+const app = express();
+const http = require('http');
+const socketIO = require('socket.io');
+// wraps express app with http Server
+const server = http.Server(app);
+// creates a server socket from the wrapped express app
+const io = socketIO(server);
+import project from './project';
 
+// server internally calls on its connection event and takes a client's socket
 io.on('connection', (socket) => {
-  console.log("connected to socket! socket:", socket);
-})
+  // TODO: make sure server connects!!
+  console.log("connected to socket!"); 
+
+  // socket functions to allow collaboration
+  project(socket, io);
+
+});
 
 mongoose.connect(process.env.MONGODB_URI);
 
@@ -222,7 +229,7 @@ app.get('/logout', function(req, res) {
   req.logout();
 })
 
-
-app.listen(process.env.port || 1337, () => { console.log('listening on port 1337') });
+// socket setup on this port
+server.listen(process.env.port || 1337, () => { console.log('listening on port 1337') });
 
 console.log('Server running at http://127.0.0.1:1337/');

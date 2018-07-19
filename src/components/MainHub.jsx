@@ -153,7 +153,8 @@ class MainHub extends React.Component {
       docRender = this.state.filteredDocuments.map((doc, i) => <DocCard key={i} user={this.state.currUser} doc={doc} openDoc={()=>this.openDoc(doc._id)} /> )
     }
     return (this.state.openDoc ?
-      (<Doc doc={this.state.loadDoc} id={this.state.currUser} goHome={() => this.goHome()} />)
+      // pass socket to Doc, which will render TextBox
+      (<Doc doc={this.state.loadDoc} id={this.state.currUser} goHome={() => this.goHome()} socket={this.props.socket}/>)
       :
       (
         <div>
