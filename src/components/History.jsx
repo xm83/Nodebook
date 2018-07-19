@@ -13,8 +13,9 @@ class History extends React.Component {
       current: {},
       name: '',
       owner: '',
-      readOnly: true
-    }
+      readOnly: true,
+      orig: '',
+    };
     this.onChange = (editorState) => {
       this.setState({ editorState });
     };
@@ -39,6 +40,7 @@ class History extends React.Component {
         current,
         name,
         owner,
+        orig: JSON.parse(current.contents),
       });
     });
   }
@@ -76,7 +78,46 @@ class History extends React.Component {
     });
   }
 
+  changes() {
+    const { editorState, orig } = this.state;
+    const raw = convertToRaw(editorState.getCurrentContent());
+    const changes = [];
+    if (orig === '') return changes;
+    raw.blocks.forEach((block) => {
+      let matched = false;
+      orig.blocks.forEach((origBlock) => {
+        if (block.key === origBlock.key && !matched) {
+          matched = true;
+          if (block.text !== origBlock.text) {
+            const change = `"${origBlock.text}" was changed to "${block.text}"`;
+            changes.push(change);
+          }
+        }
+      });
+      let newChange = `"${block.text}" was added`;
+      if (block.text === '') {
+        newChange = 'New line added';
+      }
+      changes.push(newChange);
+    });
+
+    orig.blocks.forEach((origBlock) => {
+      let matched = false;
+      raw.blocks.forEach((block) => {
+        if (block.key === origBlock.key && !matched) {
+          matched = true;
+        }
+      });
+      let newChange = `"${origBlock.text}" was deleted`;
+      if (origBlock.text === '') {
+        newChange = 'New line removed';
+      }
+      changes.push(newChange);
+    });
+    return changes;
+  }
   render() {
+    const changes = this.changes();
     return (
       <div>
         <h1>{this.state.name} History</h1>
@@ -93,8 +134,16 @@ class History extends React.Component {
             onClick={() => { this.change(version.contents, version.style); }}
           >{version.date}</button>))}</div>
         </div>
+        <div className="row">
+          <h3>Differences from Current</h3>
+          <div>
+            {changes.map(change => (
+              <p>{change}</p>
+            ))}
+          </div>
+        </div>
         <Button onClick={() => this.revert()} type="Revert Changes" />
-        <Button onClick={() => this.props.cancel() } type="Cancel" />
+        <Button onClick={() => this.props.cancel()} type="Cancel" />
       </div>
     );
   }
