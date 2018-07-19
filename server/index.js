@@ -20,7 +20,7 @@ import project from './project';
 // server internally calls on its connection event and takes a client's socket
 io.on('connection', (socket) => {
   // TODO: make sure server connects!!
-  console.log("connected to socket!"); 
+  console.log("connected to socket!");
 
   // socket functions to allow collaboration
   project(socket, io);

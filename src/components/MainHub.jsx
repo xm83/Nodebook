@@ -127,7 +127,9 @@ class MainHub extends React.Component {
     let filtDocs = []
     allDocs.map(doc => {
       for (var x = 0; x < doc.collaborators.length; x++) {
-        if (doc.collaborators[x].firstName.toLowerCase().includes(e.target.value.toLowerCase()) || doc.collaborators[x].lastName.toLowerCase().includes(e.target.value.toLowerCase())) {
+        if (doc.collaborators[x].firstName.toLowerCase().includes(e.target.value.toLowerCase()) ||
+            doc.collaborators[x].lastName.toLowerCase().includes(e.target.value.toLowerCase()) ||
+           (doc.collaborators[x].firstName.toLowerCase() + ' ' + doc.collaborators[x].lastName.toLowerCase()).includes(e.target.value.toLowerCase())) {
           filtDocs.push(doc)
         }
       }
@@ -237,8 +239,9 @@ class MainHub extends React.Component {
               </Modal>
           </div>
           <div className="container" style={{display: 'flex', flexDirection:'row', flexWrap: 'wrap'}}>
-            {docRender}
-          </div>
+          {docRender}
+        </div>
+
           <Droppable
             type={['document']}
             onDrop={this.onDrop.bind(this)}>
