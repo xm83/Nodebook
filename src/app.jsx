@@ -12,25 +12,19 @@ export default class App extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      loggedIn: false,
-      connected: false
+      loggedIn: false
     }
   }
 
   componentDidMount() {
-    // socket setup
-    this.socket = io('http://localhost:1337')
-    // if there is a connection event from server:
-    this.socket.on('connection', () => {
+    // creates a client socket 
+    this.socket = io('http://localhost:1337');
+    this.socket.on('connect', () => {
       console.log("connected to socket!")
-      this.setState({
-        connecting: true
-      })
     })
-    // if there is a disconnect event from server:
-    this.socket.on('disconnect', () => this.setState({
-      connecting: false
-    }))
+    this.socket.on('disconnect', () => {
+      console.log("disconnected to socket!")
+    })
 
 
     // see if user is logged in already
@@ -71,12 +65,14 @@ export default class App extends React.Component {
   }
 
   render() {
-    let log = this.state.loggedIn
+    let log = this.state.loggedIn;
     // if loggedIn is true, go to Doc.js which is our main page
+
+    // pass socket to children components
     return (log ?
-      (<MainHub logOut={this.logOut}/>)
+      (<MainHub logOut={this.logOut} socket={this.socket}/>)
       :
-      (<HomePage logIn={this.logIn} />)
+      (<HomePage logIn={this.logIn} socket={this.socket}/>)
     );
   }
 }

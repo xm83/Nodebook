@@ -12,7 +12,6 @@ class DocCard extends React.Component {
   }
 
   render() {
-    console.log(this.props.doc._id)
     return (
       <Draggable type="document" onClick={()=>this.props.sendData()}>
         <p>{this.props.doc.title}</p>
