@@ -1,10 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Modal from 'react-modal';
+import axios from 'axios'
+import History from './History'
 import Button from './Button';
 import FormLine from './FormLine';
 import TextBox from './TextBox';
-import axios from 'axios'
 
 const customStyles = {
   content : {
@@ -28,12 +29,18 @@ class Doc extends React.Component {
       modalIsOpen: false,
       shareUserId: "",
       email: "",
-      collaborators: []
+      collaborators: [],
+      versionDisplay: false,
+      reverted: false,
+
+
+
     }
 
     this.openModal = this.openModal.bind(this);
     this.afterOpenModal = this.afterOpenModal.bind(this);
     this.closeModal = this.closeModal.bind(this);
+    this.cancel = this.cancel.bind(this);
   }
 
   componentDidMount() {
@@ -42,11 +49,11 @@ class Doc extends React.Component {
     })
     .then((resp) => {
       this.setState({
-        collaborators: resp.data.collaborators.collaborators
+        collaborators: resp.data.collaborators.collaborators,
+        reverted: false,
       })
     })
   }
-
 
   openModal = () => {
     this.setState({modalIsOpen: true});
@@ -118,12 +125,20 @@ class Doc extends React.Component {
     })
   }
 
+  showVersions() {
+    this.setState({
+      versionDisplay: true
+    })
+  }
 
+  cancel() {
+    this.setState({
+      versionDisplay: false
+    })
+  }
 
   render(){
     let collabNames = this.state.collaborators.map((collab) => {
-      console.log(collab)
-      console.log(this.state.collaborators)
       return (
         <li>
           {collab.firstName} {collab.lastName} <Button type="Remove" onClick={() => this.removeColl(collab._id)} />
@@ -131,8 +146,8 @@ class Doc extends React.Component {
       )
     });
 
-    return (
-      <div>
+    return (!this.state.versionDisplay ?
+      (<div>
         <h1> {this.props.doc.title} </h1>
         <Button type="Home" onClick={()=>this.props.goHome()}/>
         <div>
@@ -159,7 +174,9 @@ class Doc extends React.Component {
             </Modal>
         </div>
         <TextBox docId={this.props.doc._id} content={this.props.doc.contents} styles={this.props.doc.styles}/>
-      </div>
+        <Button type="Version History" onClick={() => this.showVersions()} />
+      </div>) :
+      (<History doc={this.props.doc} cancel={() => this.cancel()} />)
     )
   }
 }
