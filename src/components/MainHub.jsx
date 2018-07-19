@@ -240,13 +240,15 @@ class MainHub extends React.Component {
           </div>
           <div className="container" style={{display: 'flex', flexDirection:'row', flexWrap: 'wrap'}}>
           {docRender}
-        </div>
+          </div>
 
-          <Droppable
-            type={['document']}
-            onDrop={this.onDrop.bind(this)}>
-            <p> Drop Me Here </p>
-          </Droppable>
+            <div style={{position: 'absolute', bottom: 10, right: 10}}>
+              <Droppable
+                type={['document']}
+                onDrop={this.onDrop.bind(this)}>
+                <i className="fa fa-2x fa-trash"></i>
+              </Droppable>
+            </div>
         </div>
       )
     )
