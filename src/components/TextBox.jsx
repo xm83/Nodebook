@@ -41,7 +41,7 @@ export default class TextBox extends React.Component {
       headers: false,
       headerList: [],
     };
-    
+
   }
 
   componentDidMount() {
@@ -78,7 +78,7 @@ export default class TextBox extends React.Component {
   }
 
   remoteStateChange = (res) => {
-    
+
     let update = EditorState.createWithContent(convertFromRaw(res.rawState))
     let update2 = EditorState.forceSelection(update, this.state.editorState.getSelection())
 
@@ -323,7 +323,7 @@ export default class TextBox extends React.Component {
           />
         </div>
         <div className="row">
-          <div className="editor">
+          <div style={{background: 'white'}} className="editor">
             <Editor
               blockStyleFn={getBlockStyle}
               customStyleMap={this.state.styleMap}
