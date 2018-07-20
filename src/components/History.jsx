@@ -62,15 +62,13 @@ class History extends React.Component {
     const raw = convertToRaw(editorState.getCurrentContent());
     const contents =  JSON.stringify(raw);
     const styles = JSON.stringify(this.state.styleMap);
-
-    axios.post(`http://localhost:1337/saveContent/${this.props.doc._id}`, {
+    axios.post(`http://localhost:1337/revert/${this.props.doc._id}`, {
       content: contents,
       style: styles,
     })
     .then((resp) => {
       if (resp.status === 200) {
-        console.log('Reverted');
-        this.props.cancel();
+        this.props.changeDoc()
       }
     })
     .catch((err) => {

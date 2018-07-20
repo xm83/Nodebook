@@ -35,11 +35,10 @@ class Doc extends React.Component {
       newContent: this.props.doc.contents,
       newStyle: this.props.doc.styles,
     }
-
+    console.log('Content', this.props.doc.contents)
     this.openModal = this.openModal.bind(this);
     this.afterOpenModal = this.afterOpenModal.bind(this);
     this.closeModal = this.closeModal.bind(this);
-    this.cancel = this.cancel.bind(this);
   }
 
   componentDidMount() {
@@ -126,18 +125,24 @@ class Doc extends React.Component {
   }
 
   showVersions() {
+    console.log(this.state.newContent)
+    console.log(this.state.newStyle)
     this.setState({
       versionDisplay: true
     })
   }
 
-  revert() {
-    axios.get(`http://localhost:1337/loadproject/` + docId)
+  changeDoc() {
+    axios.get(`http://localhost:1337/loadproject/` + this.props.doc._id)
     .then((proj) => {
       this.setState({
-        openDoc: !this.state.openDoc,
-        loadDoc: proj.data.projectObject
+        newContent: proj.data.projectObject.contents,
+        newStyle: proj.data.projectObject.styles,
+        versionDisplay: false
       })
+    })
+    .catch((err) => {
+      console.log(err)
     })
   }
 
@@ -147,7 +152,11 @@ class Doc extends React.Component {
     })
   }
 
+
+
+
   render(){
+
     let collabNames = this.state.collaborators.map((collab) => {
       return (
         <li className="Collabs">
@@ -196,9 +205,9 @@ class Doc extends React.Component {
             </form>
           </Modal>
         </div>
-        <TextBox docId={this.props.doc._id} content={this.props.doc.contents} styles={this.props.doc.styles} socket={this.props.socket}/>
+        <TextBox docId={this.props.doc._id} content={this.state.newContent} styles={this.state.newStyle} socket={this.props.socket}/>
         </div>) :
-      (<History doc={this.props.doc} cancel={() => this.cancel()} revert={() => this.revert()}/>)
+      (<History changeDoc={()=> this.changeDoc()} doc={this.props.doc} cancel={()=>this.cancel()}/>)
     )
   }
 }

@@ -276,11 +276,33 @@ app.post('/saveContent/:docId', (req, res) => {
         styles: req.body.style,
         versions: newVersionArr,
       })
-        .then(res.json({ status: 200, message: 'Saved' }))
+        .then(res.json({ status: 200, message: 'Saved', content: req.body.content, style:req.body.style }))
         .catch(err => res.json({ status: `Error: ${err}` }));
     }
   });
 });
+
+app.post('/revert/:docId', (req, res) => {
+  Project.findById(req.params.docId)
+  .then((project) => {
+    const newVersionArr = project.versions;
+    let date = new Date()
+    let formatedDate = dateformat(date, 'mmmm dS, yyyy, h:MM TT')
+    let verNum = newVersionArr.length+1
+    newVersionArr.push({
+      contents: req.body.content,
+      styles: req.body.style,
+      date: 'V' + verNum + ' - ' + formatedDate,
+    });
+    Project.findByIdAndUpdate(req.params.docId, {
+      contents: req.body.content,
+      styles: req.body.style,
+      versions: newVersionArr,
+    })
+      .then(res.json({ status: 200, message: 'Saved'}))
+      .catch(err => res.json({ status: `Error: ${err}` }));
+  })
+})
 
 app.get('/logout', (req) => {
   req.session.destroy()
