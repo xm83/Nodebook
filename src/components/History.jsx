@@ -118,7 +118,19 @@ class History extends React.Component {
     const changes = this.changes();
     return (
       <div>
-        <h1>{this.state.name} History</h1>
+        <nav className="navbar" style={{background: 'white'}}>
+          <div>
+            <a className="navbar-brand" onClick={() => this.goHome()} href="#">
+              <img style={{height: '40px'}} className = 'navLogo' src={'https://i.imgur.com/VpF5stX.png'} alt={'cant get image'} width='70'/>
+            </a>
+          </div>
+          <form className="form-inline">
+            {/* <Button type="Version History" onClick={() => this.showVersions()} revert={()=>this.revert()} /> */}
+            <button style={{marginRight: '1vw'}} type="button" className="btn btn-outline-primary my-2 my-sm-0" onClick={() => this.props.cancel()}>Back</button>
+            <button type="button" className="btn btn-outline-primary my-2 my-sm-0" onClick={this.openModal}>Share</button>
+          </form>
+        </nav>
+        <center><h1>{this.state.name} History</h1></center>
         <div className="row">
           <div className="reader">
             <Editor
@@ -127,7 +139,9 @@ class History extends React.Component {
               readOnly={this.state.readOnly}
             />
           </div>
-          <div>{this.state.versions.map(version => (<button
+          <div className="container" style={{display: 'flex', flexDirection:'row', flexWrap: 'wrap', paddingTop: '8vh', paddingBottom: '4vh'}}>{this.state.versions.map(version => (<button
+            className="text-center d-inline-block"
+            style={{ marginTop: '3vh', marginLeft: '1vw', marginRight: '1vw', height: '7vh', width: '15vw' }}
             key={version.date}
             onClick={() => { this.change(version.contents, version.style); }}
           >{version.date}</button>))}</div>
@@ -141,7 +155,6 @@ class History extends React.Component {
           </div>
         </div>
         <Button onClick={() => this.revert()} type="Revert Changes" />
-        <Button onClick={() => this.props.cancel()} type="Cancel" />
       </div>
     );
   }
