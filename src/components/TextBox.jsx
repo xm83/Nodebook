@@ -34,7 +34,9 @@ export default class TextBox extends React.Component {
       interval: '',
       autoSave: false,
       search: '',
-      pending: false
+      pending: false,
+      headers: false,
+      headerList: [],
     };
   }
   componentDidMount() {
@@ -79,13 +81,26 @@ export default class TextBox extends React.Component {
   }
   // track what the user is changing
   onChange = (editorState) => {
+    this.search('')
     // console.log('this.state.pending', this.state.pending)
     const next = convertToRaw(editorState.getCurrentContent())
     const last = convertToRaw(this.state.editorState.getCurrentContent())
-    console.log('NEXT', next);
-    console.log('LAST', last);
+    // console.log('NEXT', next);
+    // console.log('LAST', last);
     let changed = false;
     next.blocks.forEach((block) => {
+      // let styles = block.inlineStyleRanges;
+      // if (styles){
+      //   for(let i = 0; i < styles.length; i++){
+      //     if (styles[i].style === 'highlighted'){
+      //       console.log('HELLLLLLLLLLLLO', styles);
+      //       // console.log('OLd', styes);
+      //       // styles.splice(i, 1)
+      //       // console.log('New', styes);
+      //     }
+      //   }
+      //   // block.inlineStyleRanges = styles;
+      // }
       last.blocks.forEach((lastBlock) => {
         if (block.key === lastBlock.key && block.text !== lastBlock.text ||
             block.key === lastBlock.key && JSON.stringify(block.inlineStyleRanges) !== JSON.stringify(lastBlock.inlineStyleRanges) ||
@@ -93,6 +108,11 @@ export default class TextBox extends React.Component {
           changed = true;
       })
     })
+    _.each(next.blocks, (block) => {
+      block.inlineStyleRanges = block.inlineStyleRanges.filter(style => (
+        style.style !== 'highlighted'
+      ));
+    });
     if (changed){
       const socket = this.props.socket;
       // if (!this.state.pending) {
@@ -102,7 +122,7 @@ export default class TextBox extends React.Component {
         }, () => {
           this.props.socket.emit('syncDocument', {
             docId: this.props.docId,
-            rawState: convertToRaw(editorState.getCurrentContent()),
+            rawState: next,
             rawStyle: JSON.stringify(this.state.styleMap)
           });
         })
@@ -246,8 +266,10 @@ export default class TextBox extends React.Component {
       console.log('Error: ', err);
     });
   }
-  search(search) {
-    this.state.styleMap.highlighted = { backgroundColor: 'yellow' };
+  search(search, outline) {
+    if (!outline){
+      this.state.styleMap.highlighted = { backgroundColor: 'yellow' };
+    }
     const { editorState } = this.state;
     const raw = convertToRaw(editorState.getCurrentContent());
     _.each(raw.blocks, (block) => {
@@ -287,7 +309,73 @@ export default class TextBox extends React.Component {
     // console.log(raw);
   }
 
+  regex() {
+    const search = this.state.search;
+    this.state.styleMap.highlighted = { backgroundColor: 'yellow' };
+    const { editorState } = this.state;
+    const raw = convertToRaw(editorState.getCurrentContent());
+
+    const regex = new RegExp(search, 'g');
+    _.each(raw.blocks, (block) => {
+      let match;
+      const text = block.text
+      while ((match = regex.exec(text)) != null) {
+        if (match) {
+          const mLen = match[0].length;
+          let checked = false;
+          for (let j = 0; j < block.inlineStyleRanges.length; j++) {
+            if (block.inlineStyleRanges[j].style === 'highlighted' &&
+             block.inlineStyleRanges[j].offset === match.index) {
+              block.inlineStyleRanges[j] = {
+                offset: match.index,
+                length: mLen,
+                style: 'highlighted',
+              };
+              checked = true;
+            }
+          }
+          if (!checked) {
+            block.inlineStyleRanges.push({
+              offset: match.index,
+              length: mLen,
+              style: 'highlighted',
+            });
+          }
+        } else {
+          block.inlineStyleRanges = block.inlineStyleRanges.filter(style =>
+                (!style.style === 'highlighted'));
+        }
+      }
+    });
+
+
+    const cooked = convertFromRaw(raw);
+    this.setState({
+      editorState: EditorState.createWithContent(cooked),
+      search,
+    });
+  }
+
+  findHeaders() {
+    const { editorState } = this.state;
+    const raw = convertToRaw(editorState.getCurrentContent());
+    const headers = [];
+    raw.blocks.forEach((block) => {
+      if (block.type.substr(0, 6) === 'header') {
+        headers.push(block.text);
+      }
+    });
+    return headers;
+  }
+
+  header(header) {
+    this.state.styleMap.highlighted = { backgroundColor: 'lightskyblue' };
+    this.search(header, true);
+  }
+
+
   render() {
+    const headerList = this.findHeaders();
     return (
       <div id="textBox">
         <div id="textOptions">
@@ -296,7 +384,11 @@ export default class TextBox extends React.Component {
             value={this.state.search}
             placeholder="Search"
             onChange={(e) => { this.search(e.target.value); }}
-          /> <br />
+          /> <button onClick={() => {
+            if (this.state.search) {
+              this.regex();
+            }
+          }}>RegEx</button><br />
           {blockStyles.map(({ style, title }) =>
           (<button key={title} onClick={() => { this.block(style); }}>{title}</button>))}
           <br />
@@ -312,8 +404,8 @@ export default class TextBox extends React.Component {
           }}
           >Default</button>
           <input
-            ref={input => { this.fontSelect = input }}
-            onClick={() => {this.fontSelect.focus()}}
+            // ref={input => { this.fontSelect = input }}
+            // onClick={() => {this.fontSelect.focus()}}
             onKeyPress={(e) => {
               if (e.key === 'Enter') {
                 this.state.styleMap[String(e.target.value)] = { fontSize: e.target.value };
@@ -346,9 +438,21 @@ export default class TextBox extends React.Component {
             onBlur={()=>{console.log('BLUR');}}
           />
         </div>
-        {(this.state.autoSave)?<p>Saving...</p>:<p></p>}
-        <Button type="Save" onClick={()=>this.save()}/>
-      </div>
-    );
+        <div>
+          {this.state.headers ? <div>
+            <h1>Outline</h1>
+            {headerList.map(header => {if (header !== '') return <div>
+              <button onClick={()=>{this.header(header)}}>{header}</button>
+            </div>})}
+          </div> : <div />}
+        </div>
+      {(this.state.autoSave) ? <p>Saving...</p> : <p />}
+      <Button type="Save" onClick={() => this.save()} />
+      <Button
+        type="Toggle Outline"
+        onClick={() => this.setState({ headers: !this.state.headers })}
+      />
+    </div>
+  );
   }
 }
