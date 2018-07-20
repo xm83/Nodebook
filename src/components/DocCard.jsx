@@ -12,17 +12,18 @@ class DocCard extends React.Component {
   }
 
   render() {
+    console.log('MINE', this.props.doc.contents)
     return (
       <Draggable type="document" onMouseDown={()=>this.props.sendData()}>
         <div onClick={()=>this.props.openDoc()} className=" doc-card text-center d-inline-block"
             style={{marginTop: '3vh', marginLeft: '1vw',
-            marginRight: '1vw', background: 'white', height: '35vh', width: '15vw'}}>
-          <div style={{background: 'linear-gradient(to top, #dfe9f3 0%, white 100%)', display: 'flex', flex: '1', flexDirection: 'column', height: '100%'}}>
+            marginRight: '1vw', height: '35vh', width: '15vw'}}>
+          <div style={{background: 'white', display: 'flex', flex: '1', flexDirection: 'column', height: '100%'}}>
             <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', fontSize: '30px', flex: '2'}}>
-              <div>{this.props.doc.title}</div>
+              <div style={{fontSize: '8px'}}>{this.props.doc.contents[17]}</div>
             </div>
-            <div style={{fontSize: '12px', flex: '1'}}>
-              <div> {this.props.doc.owner.firstName} {this.props.doc.owner.lastName} </div>
+            <div style={{borderTop: '1px solid grey', fontSize: '12px', flex: '1'}}>
+              <div style={{paddingTop: '2vh'}}>{this.props.doc.title}</div>
               <div>{new Date(this.props.doc.createdAt).toLocaleDateString()}</div>
             </div>
           </div>

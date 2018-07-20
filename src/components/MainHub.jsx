@@ -208,9 +208,11 @@ class MainHub extends React.Component {
       :
       (
         <div style={{background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)'}}>
-          <nav className="navbar navbar-light bg-light" style={{position: 'fixed'}}>
+          <nav className="navbar" style={{position: 'fixed', background:'white'}}>
             <div>
-            <a class="navbar-brand" href="#">NAME HERE</a>
+              <a className="navbar-brand" onClick={() => this.goHome()} href="#">
+                <img style={{height: '40px'}} className = 'navLogo' src={'https://i.imgur.com/VpF5stX.png'} alt={'cant get image'} width='70'/>
+              </a>
             </div>
             <form className="form-inline">
               <input className="form-control mr-sm-2" aria-label="Search" type="text" placeholder="Search" onChange={(e)=> this.filter(e)}/>
@@ -264,7 +266,7 @@ class MainHub extends React.Component {
                 </form>
               </Modal>
           </div>
-          <div className="container" style={{display: 'flex', flexDirection:'row', flexWrap: 'wrap'}}>
+          <div className="container" style={{display: 'flex', flexDirection:'row', flexWrap: 'wrap', paddingTop: '8vh', paddingBottom: '4vh'}}>
           {docRender}
           </div>
 
