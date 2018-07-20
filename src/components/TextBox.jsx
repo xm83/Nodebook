@@ -169,7 +169,6 @@ export default class TextBox extends React.Component {
   }
 
   toggleFont(font) {
-    console.log("font:", font);
 
     let state = this.state.editorState;
     let set = state.getCurrentInlineStyle();
@@ -178,18 +177,27 @@ export default class TextBox extends React.Component {
     console.log("set:", set);
     for (let item of set.keys()) {
       console.log("item:", item);
-      if (typeof Number(item) == 'number') {
+      // or could just do parseInt(item, 10) to get just base 10 number
+      if (typeof Number(item) == 'number' && item[0] !== '#') {
         // remove this font
         console.log("removing item", item);
         // state = RichUtils.toggleInlineStyle(state, item)
         updated = Modifier.removeInlineStyle(updated, state.getSelection(), item);
       }
     }
-    // apply new color
-    updated = Modifier.applyInlineStyle(updated, state.getSelection(), font);
-    let newEditorState = EditorState.createWithContent(updated);
-
-    this.onChange(newEditorState);
+    // apply new font if font is passed in 
+    if (typeof font === "string") {
+      console.log("font:", font);
+      updated = Modifier.applyInlineStyle(updated, state.getSelection(), font);
+      let newEditorState = EditorState.createWithContent(updated);
+      this.onChange(newEditorState);   
+    } else {
+      let newEditorState = EditorState.createWithContent(updated);
+      this.setState({editorState: newEditorState}, () => {
+        // call the callback, which is this.block(style)
+        font()
+      })
+    }
   }
 
   inline(inline) {
@@ -382,7 +390,12 @@ export default class TextBox extends React.Component {
             }
           }}>RegEx</button><br />
           {blockStyles.map(({ style, title }) =>
-          (<button key={title} onClick={() => { this.block(style); }}>{title}</button>))}
+          (<button key={title} onClick={() => { 
+            this.toggleFont(() => {
+              this.block(style); 
+            });
+          
+          }}>{title}</button>))}
           <br />
           <button onClick={() => { this.inline('BOLD'); }}><b>B</b></button>
           <button onClick={() => { this.inline('ITALIC'); }}><i>I</i></button>
@@ -400,6 +413,7 @@ export default class TextBox extends React.Component {
               if (e.key === 'Enter') {
                 this.state.styleMap[String(e.target.value)] = { fontSize: e.target.value };
                 this.toggleFont(String(e.target.value));
+                // this.inline(String(e.target.value));
               }
             }
                   }
