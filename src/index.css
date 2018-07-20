@@ -5,9 +5,12 @@ html, body {
 
 .editor {
   border: 2px solid black;
-  min-height: 300px;
-  min-width: 300px;
+  min-height: 500px;
+  min-width: 80vw;
+  max-width: 80vw;
   padding: 15px;
+  max-height: 500px;
+  overflow: auto;
 }
 .reader {
   border: 2px solid black;
