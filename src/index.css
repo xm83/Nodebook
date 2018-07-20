@@ -40,3 +40,40 @@ html, body {
   border-color: blue;
   cursor: pointer;
 }
+
+.addDoc:hover {
+  cursor: pointer;
+}
+
+.navbar {
+  width: 100%
+}
+
+.docNameInput {
+  width: 100%
+}
+
+.ModalTitle {
+  text-align: center;
+  margin-bottom: 15px
+}
+
+.modalButtons {
+  float: right;
+}
+
+.createDoc {
+  display: inline-block
+}
+
+.emailInput {
+  margin-bottom: 20px
+}
+
+.shareHeader {
+  text-decoration: underline
+}
+.Collabs {
+  list-style-type: none;
+  margin-left: -40px
+}

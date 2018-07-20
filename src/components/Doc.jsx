@@ -60,7 +60,7 @@ class Doc extends React.Component {
   }
 
   afterOpenModal = () => {
-    this.subtitle.style.color = '#f00';
+    ;
   }
 
   closeModal = () => {
@@ -150,7 +150,7 @@ class Doc extends React.Component {
   render(){
     let collabNames = this.state.collaborators.map((collab) => {
       return (
-        <li>
+        <li className="Collabs">
           {collab.firstName} {collab.lastName} <Button type="Remove" onClick={() => this.removeColl(collab._id)} />
         </li>
       )
@@ -178,19 +178,23 @@ class Doc extends React.Component {
             style={customStyles}
             contentLabel="Share Your Document"
           >
-            <h2 ref={subtitle => this.subtitle = subtitle}> Users On This Document </h2>
+            <form className="well">
+              <h5 className="shareHeader"> Users On This Document </h5>
               <ul>
                 {collabNames}
               </ul>
-              <form className = "well">
-                <h3 className = "title"> Users To Share With </h3>
-                <FormLine name = "Email" type = "text" value = {this.state.email} onChange={(e)=> this.setState({
-                  email: e.target.value
-                })}/>
+              <div classname="input-group-text">
+              <hr />
+              <p>Add New User</p>
+              <input type='text' className="form-control emailInput" placeholder='Email' value={this.state.email}
+                onChange={(e)=>this.setState({email: e.target.value})}></input>
+              </div>
+              <div className="modalButtons">
                 <Button type = "Share" onClick={this.share}/>
                 <Button type="Cancel" onClick={this.closeModal}/>
-              </form>
-            </Modal>
+              </div>
+            </form>
+          </Modal>
         </div>
         <TextBox docId={this.props.doc._id} content={this.props.doc.contents} styles={this.props.doc.styles} socket={this.props.socket}/>
         </div>) :
