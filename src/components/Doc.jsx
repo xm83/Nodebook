@@ -170,7 +170,7 @@ class Doc extends React.Component {
         <nav className="navbar" style={{background: 'white'}}>
           <div>
             <a className="navbar-brand" onClick={() => this.props.goHome()} href="#">
-              <img style={{height: '40px'}} className = 'navLogo' src={'https://i.imgur.com/VpF5stX.png'} alt={'cant get image'} width='70'/>
+              <img style={{height: '40px'}} className = 'navLogo' src={'https://i.imgur.com/EeRNcBe.png'} alt={'cant get image'} width='70'/>
             </a>
           </div>
           <form className="form-inline">
