@@ -169,7 +169,7 @@ class Doc extends React.Component {
       (<div style={{height: '100vh', background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)'}}>
         <nav className="navbar" style={{background: 'white'}}>
           <div>
-            <a className="navbar-brand" onClick={() => this.goHome()} href="#">
+            <a className="navbar-brand" onClick={() => this.props.goHome()} href="#">
               <img style={{height: '40px'}} className = 'navLogo' src={'https://i.imgur.com/VpF5stX.png'} alt={'cant get image'} width='70'/>
             </a>
           </div>
@@ -209,7 +209,7 @@ class Doc extends React.Component {
         </div>
         <center><TextBox docId={this.props.doc._id} content={this.state.newContent} styles={this.state.newStyle} socket={this.props.socket}/></center>
         </div>) :
-      (<History changeDoc={()=> this.changeDoc()} doc={this.props.doc} cancel={()=>this.cancel()}/>)
+      (<History goHome={()=> this.props.goHome()} changeDoc={()=> this.changeDoc()} doc={this.props.doc} cancel={()=>this.cancel()}/>)
     )
   }
 }
