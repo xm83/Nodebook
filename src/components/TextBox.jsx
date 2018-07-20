@@ -88,7 +88,8 @@ export default class TextBox extends React.Component {
     next.blocks.forEach((block) => {
       last.blocks.forEach((lastBlock) => {
         if (block.key === lastBlock.key && block.text !== lastBlock.text ||
-            block.key === lastBlock.key && JSON.stringify(block.inlineStyleRanges) !== JSON.stringify(lastBlock.inlineStyleRanges))
+            block.key === lastBlock.key && JSON.stringify(block.inlineStyleRanges) !== JSON.stringify(lastBlock.inlineStyleRanges) ||
+            block.key === lastBlock.key && block.type !== lastBlock.type)
           changed = true;
       })
     })
