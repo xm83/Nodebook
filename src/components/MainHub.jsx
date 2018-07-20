@@ -264,7 +264,7 @@ class MainHub extends React.Component {
                 </form>
               </Modal>
           </div>
-          <div className="container" style={{display: 'flex', flexDirection:'row', flexWrap: 'wrap'}}>
+          <div className="container" style={{display: 'flex', flexDirection:'row', flexWrap: 'wrap', paddingTop: '8vh', paddingBottom: '4vh'}}>
           {docRender}
           </div>
 
