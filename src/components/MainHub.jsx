@@ -207,7 +207,7 @@ class MainHub extends React.Component {
       (<Doc doc={this.state.loadDoc} id={this.state.currUser} goHome={() => this.goHome()} socket={this.props.socket}/>)
       :
       (
-        <div style={{background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)'}}>
+        <div>
           <nav className="navbar" style={{position: 'fixed', background:'white'}}>
             <div>
               <a className="navbar-brand" onClick={() => this.goHome()} href="#">
@@ -260,8 +260,8 @@ class MainHub extends React.Component {
                   </div>
                   <br/>
                   <div className="modalButtons">
-                    <Button type="Return" onClick={this.closeModal}/>
-                    <Button type="Create" onClick={()=>this.create()}/>
+                    <button style={{marginRight: '1 vw'}} type="button" className="btn btn-dark button" onClick = {this.closeModal}>Return</button>
+                    <button type="button" className="btn btn-dark button" onClick={()=>this.create()}>Create</button>
                   </div>
                 </form>
               </Modal>
