@@ -60,7 +60,7 @@ class Doc extends React.Component {
   }
 
   afterOpenModal = () => {
-    this.subtitle.style.color = '#f00';
+    ;
   }
 
   closeModal = () => {
@@ -150,25 +150,25 @@ class Doc extends React.Component {
   render(){
     let collabNames = this.state.collaborators.map((collab) => {
       return (
-        <li>
+        <li className="Collabs">
           {collab.firstName} {collab.lastName} <Button type="Remove" onClick={() => this.removeColl(collab._id)} />
         </li>
       )
     });
 
     return (!this.state.versionDisplay ?
-      (<div>
+      (<div style={{background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)'}}>
         <nav className="navbar navbar-light bg-light">
           <div>
           <a class="navbar-brand" onClick={()=>this.props.goHome()} href="#">NAME HERE</a>
           </div>
           <form className="form-inline">
             {/* <Button type="Version History" onClick={() => this.showVersions()} revert={()=>this.revert()} /> */}
-            <button type="button" className="btn btn-primary my-2 my-sm-0" onClick={() => this.showVersions()} revert={()=>this.revert()}>History</button>
-            <button type="button" className="btn btn-primary my-2 my-sm-0" onClick={this.openModal}>Share</button>
+            <button style={{marginRight: '1vw'}} type="button" className="btn btn-outline-primary my-2 my-sm-0" onClick={() => this.showVersions()} revert={()=>this.revert()}>History</button>
+            <button type="button" className="btn btn-outline-primary my-2 my-sm-0" onClick={this.openModal}>Share</button>
           </form>
         </nav>
-        <h1> {this.props.doc.title} </h1>
+        <h1 className="text-center"> {this.props.doc.title} </h1>
         {/* <Button type="Home" onClick={()=>this.props.goHome()}/> */}
         <div>
           <Modal
@@ -178,22 +178,25 @@ class Doc extends React.Component {
             style={customStyles}
             contentLabel="Share Your Document"
           >
-            <h2 ref={subtitle => this.subtitle = subtitle}> Users On This Document </h2>
+            <form className="well">
+              <h5 className="shareHeader"> Users On This Document </h5>
               <ul>
                 {collabNames}
               </ul>
-              <form className = "well">
-                <h3 className = "title"> Users To Share With </h3>
-                <FormLine name = "Email" type = "text" value = {this.state.email} onChange={(e)=> this.setState({
-                  email: e.target.value
-                })}/>
+              <div classname="input-group-text">
+              <hr />
+              <p>Add New User</p>
+              <input type='text' className="form-control emailInput" placeholder='Email' value={this.state.email}
+                onChange={(e)=>this.setState({email: e.target.value})}></input>
+              </div>
+              <div className="modalButtons">
                 <Button type = "Share" onClick={this.share}/>
                 <Button type="Cancel" onClick={this.closeModal}/>
-              </form>
-            </Modal>
+              </div>
+            </form>
+          </Modal>
         </div>
         <TextBox docId={this.props.doc._id} content={this.props.doc.contents} styles={this.props.doc.styles} socket={this.props.socket}/>
-        <Button type="Version History" onClick={() => this.showVersions()} revert={()=>this.revert()} />
         </div>) :
       (<History doc={this.props.doc} cancel={() => this.cancel()} revert={() => this.revert()}/>)
     )

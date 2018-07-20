@@ -38,6 +38,7 @@ export default class TextBox extends React.Component {
       headers: false,
       headerList: [],
     };
+
   }
   componentDidMount() {
     const socket = this.props.socket;
@@ -144,7 +145,7 @@ export default class TextBox extends React.Component {
 }
   // sync remote document edits to our editor
   remoteStateChange = (res) => {
-    console.log("res", res);
+    // console.log("res", res);
     if (res.rawState){
       let update = EditorState.createWithContent(convertFromRaw(res.rawState))
       let update2 = EditorState.forceSelection(update, this.state.editorState.getSelection())
@@ -159,7 +160,6 @@ export default class TextBox extends React.Component {
         pending: false
       });
     }
-
   }
   componentWillUnmount() {
     const socket = this.props.socket;

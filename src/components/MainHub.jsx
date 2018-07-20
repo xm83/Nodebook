@@ -7,6 +7,7 @@ import Doc from './Doc';
 import axios from 'axios'
 import DocCard from './DocCard'
 import { ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap'
+import { Draggable, Droppable } from 'react-drag-and-drop';
 
 const customStyles = {
   content : {
@@ -14,12 +15,11 @@ const customStyles = {
     left                  : '50%',
     right                 : 'auto',
     bottom                : 'auto',
-    marginRight           : '-50%',
     transform             : 'translate(-50%, -50%)'
   }
 };
 
-let docCards
+
 
 Modal.setAppElement('#App')
 
@@ -37,7 +37,8 @@ class MainHub extends React.Component {
       search: "",
       filteredDocuments: [],
       currUser: "",
-      loadDoc: ""
+      loadDoc: "",
+      idBeingDeleted: "",
     }
 
     this.openDoc= this.openDoc.bind(this)
@@ -74,7 +75,7 @@ class MainHub extends React.Component {
   }
 
   afterOpenModal = () => {
-    this.subtitle.style.color = '#f00';
+
   }
 
   closeModal = () => {
@@ -121,11 +122,22 @@ class MainHub extends React.Component {
     this.setState({
       search: e.target.value
     })
-    console.log(e.target.value)
     let allDocs = this.state.documents.slice();
-
-    console.log(allDocs)
-    let filtDocs = allDocs.filter(doc => doc.title.includes(e.target.value))
+    let filtDocs = []
+    allDocs.map(doc => {
+      for (var x = 0; x < doc.collaborators.length; x++) {
+        if (doc.collaborators[x].firstName.toLowerCase().includes(e.target.value.toLowerCase()) ||
+            doc.collaborators[x].lastName.toLowerCase().includes(e.target.value.toLowerCase()) ||
+           (doc.collaborators[x].firstName.toLowerCase() + ' ' + doc.collaborators[x].lastName.toLowerCase()).includes(e.target.value.toLowerCase())) {
+          filtDocs.push(doc)
+        }
+      }
+      if (!filtDocs.includes(doc) && (doc.title.toLowerCase().includes(e.target.value.toLowerCase()) ||
+          doc.owner.firstName.toLowerCase().includes(e.target.value.toLowerCase()) ||
+          doc.owner.lastName.toLowerCase().includes(e.target.value.toLowerCase()))) {
+        filtDocs.push(doc)
+      }
+    })
     this.setState({
       filteredDocuments: filtDocs
     })
@@ -144,7 +156,6 @@ class MainHub extends React.Component {
     })
   }
 
-  //NOT WORKING PROPERLY. DELETES< BUT THE RE-RENDER IS FUCKING UP
   deleteDoc(docId) {
     axios.post(`http://localhost:1337/deletedoc`, {
       docId: docId,
@@ -165,11 +176,16 @@ class MainHub extends React.Component {
     this.props.logOut()
   }
 
-  // reRenderDocCards() {
-  //   if (this.state.filteredDocuments) {
-  //     docRender = this.state.filteredDocuments.map((doc, i) => <DocCard key={i} doc={doc} deleteDoc={()=>this.deleteDoc(doc._id)} openDoc={()=>this.openDoc(doc._id)} /> )
-  //   }
-  // }
+
+  sendData(docId) {
+    this.setState({
+      idBeingDeleted: docId
+    })
+  }
+
+  onDrop() {
+    this.deleteDoc(this.state.idBeingDeleted)
+  }
 
   render() {
     let docRender;
@@ -183,7 +199,7 @@ class MainHub extends React.Component {
             collabNames += (doc.collaborators[x].firstName + ' ' + doc.collaborators[x].lastName + ', ')
           }
         }
-        return <DocCard collabs={collabNames} key={i} doc={doc} deleteDoc={()=>this.deleteDoc(doc._id)} openDoc={()=>this.openDoc(doc._id)} />
+        return <DocCard sendData={()=>this.sendData(doc._id)} collabs={collabNames} key={i} doc={doc} deleteDoc={()=>this.deleteDoc(doc._id)} openDoc={()=>this.openDoc(doc._id)} />
       })
     }
     return (this.state.openDoc ?
@@ -192,10 +208,9 @@ class MainHub extends React.Component {
       :
       (
         <div style={{background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)'}}>
-          <nav className="navbar navbar-light bg-light">
+          <nav className="navbar navbar-light bg-light" style={{position: 'fixed'}}>
             <div>
             <a class="navbar-brand" href="#">NAME HERE</a>
-              <button style={{marginLeft: '1vw'}} type="button" className="btn btn-outline-primary my-2 my-sm-0" onClick = {this.openModal}>Create New Doc</button>
             </div>
             <form className="form-inline">
               <input className="form-control mr-sm-2" aria-label="Search" type="text" placeholder="Search" onChange={(e)=> this.filter(e)}/>
@@ -207,23 +222,62 @@ class MainHub extends React.Component {
               isOpen={this.state.modalIsOpen}
               onAfterOpen={this.afterOpenModal}
               onRequestClose={this.closeModal}
-              style={customStyles}
+              style={{
+                overlay: {
+                  position: 'fixed',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  backgroundColor: 'rgba(255, 255, 255, 0.8)'
+                },
+                content: {
+                  position: 'absolute',
+                  top: '40%',
+                  left: '30%',
+                  right: '30%',
+                  bottom: '40%',
+                  border: '1px solid #ccc',
+                  background: '#fff',
+                  overflow: 'auto',
+                  WebkitOverflowScrolling: 'touch',
+                  borderRadius: '4px',
+                  outline: 'none',
+                  padding: '20px'
+                }
+              }}
               contentLabel="New Document"
             >
-              <h2 ref={subtitle => this.subtitle = subtitle}> New Document </h2>
-              <Button type="Return" onClick={this.closeModal}/>
-                <form className = "well">
-                  <h3 className = "title"> Create New Document </h3>
-                  <FormLine name = "Document Name" type = "text" value = {this.state.newDoc} onChange={(e)=> this.setState({
-                    newDoc: e.target.value
-                  })}/>
-                  <Button type = "Create" onClick={()=>this.create()}/>
+                <form className="well">
+                  <h2 className="ModalTitle"> Create New Document </h2>
+                  <div className="input-group-text">
+                  <input type='text' className="form-control" placeholder='Document Name'
+                    value = {this.state.newDoc} onChange={(e)=> this.setState({
+                      newDoc: e.target.value
+                    })} required></input>
+                  </div>
+                  <br/>
+                  <div className="modalButtons">
+                    <Button type="Return" onClick={this.closeModal}/>
+                    <Button type="Create" onClick={()=>this.create()}/>
+                  </div>
                 </form>
               </Modal>
           </div>
           <div className="container" style={{display: 'flex', flexDirection:'row', flexWrap: 'wrap'}}>
           {docRender}
-        </div>
+          </div>
+
+            <div className="addDoc" style={{position: 'fixed', bottom: 10, left: 10}}>
+              <i onClick = {this.openModal} className="fa fa-3x fa-plus-circle"></i>
+            </div>
+            <div style={{position: 'fixed', bottom: 10, right: 10}}>
+              <Droppable
+                type={['document']}
+                onDrop={this.onDrop.bind(this)}>
+                <i className="fa fa-3x fa-trash"></i>
+              </Droppable>
+            </div>
         </div>
       )
     )

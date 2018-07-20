@@ -20,7 +20,7 @@ import project from './project';
 // server internally calls on its connection event and takes a client's socket
 io.on('connection', (socket) => {
   // TODO: make sure server connects!!
-  console.log("connected to socket!"); 
+  console.log("connected to socket!");
 
   // socket functions to allow collaboration
   project(socket, io);
@@ -198,7 +198,7 @@ app.post('/removecollaborator', (req, res) => {
   Project.findById(req.body.projectId)
     .exec()
     .then((project) => {
-      if (req.user._id === project.owner) {
+      if (String(req.user._id) === String(project.owner)) {
         const newCollaboratorArr = project.collaborators;
         newCollaboratorArr.splice(newCollaboratorArr.indexOf(req.body.collaboratorToBeRemoved), 1);
         Project.findByIdAndUpdate(project.id, { collaborators: newCollaboratorArr })

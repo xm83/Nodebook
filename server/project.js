@@ -21,7 +21,7 @@ export default function project(socket, io) {
             }, (err, doc) => next({err, doc}))
         }
     })
- 
+
     // syncDocument
     socket.on('syncDocument', (data) => {
         console.log("server syncing document with data", data);
