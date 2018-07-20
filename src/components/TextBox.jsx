@@ -428,14 +428,13 @@ export default class TextBox extends React.Component {
             }}
           />
         </div>
-        <div className="editor">
+        <div className="editor" onClick={()=>this.refs.editor.focus()}>
           <Editor
             blockStyleFn={getBlockStyle}
             customStyleMap={this.state.styleMap}
             editorState={this.state.editorState}
             onChange={this.onChange}
-            onFocus={()=>{console.log('FOCUS');}}
-            onBlur={()=>{console.log('BLUR');}}
+            ref = 'editor'
           />
         </div>
         <div>
