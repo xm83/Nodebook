@@ -87,14 +87,14 @@ class History extends React.Component {
         if (block.key === origBlock.key && !matched) {
           matched = true;
           if (block.text !== origBlock.text) {
-            const change = `"${origBlock.text}" was changed to "${block.text}"`;
+            const change = {text: `"${origBlock.text}" was changed to "${block.text}"`, style: 'changed'};
             changes.push(change);
           }
         }
       });
-      let newChange = `"${block.text}" was added`;
+      let newChange = {text: `"${block.text}" was added`, style: 'added'} ;
       if (block.text === '') {
-        newChange = 'New line added';
+        newChange = {text: 'New line added', style: 'added'};
       }
       changes.push(newChange);
     });
@@ -106,9 +106,9 @@ class History extends React.Component {
           matched = true;
         }
       });
-      let newChange = `"${origBlock.text}" was deleted`;
+      let newChange = {text: `"${origBlock.text}" was deleted`, style: 'deleted'};
       if (origBlock.text === '') {
-        newChange = 'New line removed';
+        newChange = {text: 'New line removed', style: 'deleted'};
       }
       changes.push(newChange);
     });
@@ -117,12 +117,15 @@ class History extends React.Component {
   render() {
     const changes = this.changes();
     return (
-      <div>
+      <div className="entireDoc">
         <nav className="navbar" style={{background: 'white'}}>
           <div>
             <a className="navbar-brand" onClick={() => this.props.goHome()} href="#">
               <img style={{height: '40px'}} className = 'navLogo' src={'https://i.imgur.com/VpF5stX.png'} alt={'cant get image'} width='70'/>
             </a>
+          </div>
+          <div>
+            History
           </div>
           <form className="form-inline">
             {/* <Button type="Version History" onClick={() => this.showVersions()} revert={()=>this.revert()} /> */}
@@ -130,7 +133,6 @@ class History extends React.Component {
             <button type="button" className="btn btn-outline-primary my-2 my-sm-0" onClick={this.openModal}>Share</button>
           </form>
         </nav>
-        <center><h1>{this.state.name} History</h1></center>
         <div className="row">
           <div className="reader">
             <Editor
@@ -139,22 +141,31 @@ class History extends React.Component {
               readOnly={this.state.readOnly}
             />
           </div>
-          <div className="container" style={{display: 'flex', flexDirection:'row', flexWrap: 'wrap', paddingTop: '8vh', paddingBottom: '4vh'}}>{this.state.versions.map(version => (<button
-            className="text-center d-inline-block"
-            style={{ marginTop: '3vh', marginLeft: '1vw', marginRight: '1vw', height: '7vh', width: '15vw' }}
-            key={version.date}
-            onClick={() => { this.change(version.contents, version.style); }}
-          >{version.date}</button>))}</div>
-        </div>
-        <div className="row">
-          <h3>Differences from Current</h3>
-          <div>
-            {changes.map(change => (
-              <p>{change}</p>
+          <div className="list-group Versions">
+            {this.state.versions.map(version => (
+              <a href="#" className="list-group-item list-group-item-action" style={{marginRight: '2px'}} onClick={() => {this.change(version.contents, version.style)}}><span style={{marginRight: '5px'}}>{version.date.slice(4)}</span>
+                <span className="badge badge-dark badge-pill">
+                  {version.date.slice(0, 3)}
+                </span>
+              </a>
             ))}
           </div>
         </div>
-        <Button onClick={() => this.revert()} type="Revert Changes" />
+        <div className="differences">
+          <h3>Current Changes</h3>
+          <ul className="list-group">
+            {changes.map(change => {
+              if (change.style === 'changed') {
+                return (<li className="list-group-item list-group-item-info changer"> {change.text} </li>)
+              } else if (change.style === 'added') {
+                return (<li className="list-group-item list-group-item-success changer"> {change.text} </li>)
+              } else if (change.style === 'deleted') {
+                return (<li className="list-group-item list-group-item-danger changer"> {change.text} </li>)
+              }
+            })}
+          </ul>
+        </div>
+        <button type="button" className="btn btn-outline-primary my-2 my-sm-0 revertButton" onClick={() => this.revert()}>Revert Changes</button>
       </div>
     );
   }
