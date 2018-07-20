@@ -50,13 +50,6 @@ export default class TextBox extends React.Component {
         console.log("res.err", res.err);
         return alert("error");
       } else {
-        console.log("success with openDocument", res);
-        // // save response to this.state
-        // this.setState({
-        //   doc: res.doc
-        // })
-        console.log("res.doc", res.doc);
-        console.log("res.doc.rawState:", res.doc.rawState);
         // if there is rawState, set current editorState to rawState
         res.doc.rawState && this.setState({
           editorState: EditorState.createWithContent(convertFromRaw(res.doc.rawState)),
@@ -83,25 +76,10 @@ export default class TextBox extends React.Component {
   // track what the user is changing
   onChange = (editorState) => {
     this.search('')
-    // console.log('this.state.pending', this.state.pending)
     const next = convertToRaw(editorState.getCurrentContent())
     const last = convertToRaw(this.state.editorState.getCurrentContent())
-    // console.log('NEXT', next);
-    // console.log('LAST', last);
     let changed = false;
     next.blocks.forEach((block) => {
-      // let styles = block.inlineStyleRanges;
-      // if (styles){
-      //   for(let i = 0; i < styles.length; i++){
-      //     if (styles[i].style === 'highlighted'){
-      //       console.log('HELLLLLLLLLLLLO', styles);
-      //       // console.log('OLd', styes);
-      //       // styles.splice(i, 1)
-      //       // console.log('New', styes);
-      //     }
-      //   }
-      //   // block.inlineStyleRanges = styles;
-      // }
       last.blocks.forEach((lastBlock) => {
         if (block.key === lastBlock.key && block.text !== lastBlock.text ||
             block.key === lastBlock.key && JSON.stringify(block.inlineStyleRanges) !== JSON.stringify(lastBlock.inlineStyleRanges) ||
@@ -115,7 +93,6 @@ export default class TextBox extends React.Component {
       ));
     });
     if (changed){
-      const socket = this.props.socket;
       // if (!this.state.pending) {
         this.setState({
           editorState,
@@ -130,7 +107,6 @@ export default class TextBox extends React.Component {
       // }
     } else {
       console.log('First Map');
-      const socket = this.props.socket;
       // if (!this.state.pending) {
         this.setState({
           editorState,
@@ -140,12 +116,12 @@ export default class TextBox extends React.Component {
             docId: this.props.docId,
             rawStyle: JSON.stringify(this.state.styleMap)
           });
-    })
-  }
+      })
+    }
 }
   // sync remote document edits to our editor
   remoteStateChange = (res) => {
-    // console.log("res", res);
+    
     if (res.rawState){
       let update = EditorState.createWithContent(convertFromRaw(res.rawState))
       let update2 = EditorState.forceSelection(update, this.state.editorState.getSelection())
@@ -182,7 +158,6 @@ export default class TextBox extends React.Component {
       if (item[0] === '#') {
         // remove this color
         console.log("removing item", item);
-        // state = RichUtils.toggleInlineStyle(state, item)
         updated = Modifier.removeInlineStyle(updated, state.getSelection(), item);
       }
     }
@@ -191,14 +166,32 @@ export default class TextBox extends React.Component {
     let newEditorState = EditorState.createWithContent(updated);
     // let newEditorState2 = RichUtils.toggleInlineStyle(newEditorState, color)
     this.onChange(newEditorState);
-      // let inlineStyle = new RegExp("^#");
-      // // remove all "#colorhere" from current editorState
-      // let updated = Modifier.removeInlineStyle(state.getCurrentContent(), state.getSelection(), inlineStyle);
-      // // create a new editorState based on new state
-      // let newEditorState = EditorState.createWithContent(updated)
-      // // keep the old selection state
-      // let keepOld = EditorState.forceSelection(newEditorState, state.getSelection());
   }
+
+  toggleFont(font) {
+    console.log("font:", font);
+
+    let state = this.state.editorState;
+    let set = state.getCurrentInlineStyle();
+    let updated = state.getCurrentContent();
+    
+    console.log("set:", set);
+    for (let item of set.keys()) {
+      console.log("item:", item);
+      if (typeof Number(item) == 'number') {
+        // remove this font
+        console.log("removing item", item);
+        // state = RichUtils.toggleInlineStyle(state, item)
+        updated = Modifier.removeInlineStyle(updated, state.getSelection(), item);
+      }
+    }
+    // apply new color
+    updated = Modifier.applyInlineStyle(updated, state.getSelection(), font);
+    let newEditorState = EditorState.createWithContent(updated);
+
+    this.onChange(newEditorState);
+  }
+
   inline(inline) {
     console.log(inline);
     this.onChange(RichUtils.toggleInlineStyle(
@@ -306,7 +299,6 @@ export default class TextBox extends React.Component {
       editorState: EditorState.createWithContent(cooked),
       search,
     });
-    // console.log(raw);
   }
 
   regex() {
@@ -404,12 +396,10 @@ export default class TextBox extends React.Component {
           }}
           >Default</button>
           <input
-            // ref={input => { this.fontSelect = input }}
-            // onClick={() => {this.fontSelect.focus()}}
             onKeyPress={(e) => {
               if (e.key === 'Enter') {
                 this.state.styleMap[String(e.target.value)] = { fontSize: e.target.value };
-                this.inline(String(e.target.value));
+                this.toggleFont(String(e.target.value));
               }
             }
                   }
