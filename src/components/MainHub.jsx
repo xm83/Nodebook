@@ -15,12 +15,11 @@ const customStyles = {
     left                  : '50%',
     right                 : 'auto',
     bottom                : 'auto',
-    marginRight           : '-50%',
     transform             : 'translate(-50%, -50%)'
   }
 };
 
-let docCards
+
 
 Modal.setAppElement('#App')
 
@@ -76,7 +75,7 @@ class MainHub extends React.Component {
   }
 
   afterOpenModal = () => {
-    this.subtitle.style.color = '#f00';
+
   }
 
   closeModal = () => {
@@ -209,10 +208,9 @@ class MainHub extends React.Component {
       :
       (
         <div style={{background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)'}}>
-          <nav className="navbar navbar-light bg-light">
+          <nav className="navbar navbar-light bg-light" style={{position: 'fixed'}}>
             <div>
             <a class="navbar-brand" href="#">NAME HERE</a>
-              <button style={{marginLeft: '1vw'}} type="button" className="btn btn-outline-primary my-2 my-sm-0" onClick = {this.openModal}>Create New Doc</button>
             </div>
             <form className="form-inline">
               <input className="form-control mr-sm-2" aria-label="Search" type="text" placeholder="Search" onChange={(e)=> this.filter(e)}/>
@@ -224,29 +222,62 @@ class MainHub extends React.Component {
               isOpen={this.state.modalIsOpen}
               onAfterOpen={this.afterOpenModal}
               onRequestClose={this.closeModal}
-              style={customStyles}
+              style={{
+                overlay: {
+                  position: 'fixed',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  backgroundColor: 'rgba(255, 255, 255, 0.8)'
+                },
+                content: {
+                  position: 'absolute',
+                  top: '40%',
+                  left: '30%',
+                  right: '30%',
+                  bottom: '40%',
+                  border: '1px solid #ccc',
+                  background: '#fff',
+                  overflow: 'auto',
+                  WebkitOverflowScrolling: 'touch',
+                  borderRadius: '4px',
+                  outline: 'none',
+                  padding: '20px'
+                }
+              }}
               contentLabel="New Document"
             >
-              <h2 ref={subtitle => this.subtitle = subtitle}> New Document </h2>
-              <Button type="Return" onClick={this.closeModal}/>
-                <form className = "well">
-                  <h3 className = "title"> Create New Document </h3>
-                  <FormLine name = "Document Name" type = "text" value = {this.state.newDoc} onChange={(e)=> this.setState({
-                    newDoc: e.target.value
-                  })}/>
-                  <Button type = "Create" onClick={()=>this.create()}/>
+                <form className="well">
+                  <h2 className="ModalTitle"> Create New Document </h2>
+                  <div className="input-group-text">
+                  <input type='text' className="form-control" placeholder='Document Name'
+                    value = {this.state.newDoc} onChange={(e)=> this.setState({
+                      newDoc: e.target.value
+                    })} required></input>
+                  </div>
+                  <br/>
+                  <div className="modalButtons">
+                    <Button type="Return" onClick={this.closeModal}/>
+                    <Button type="Create" onClick={()=>this.create()}/>
+                  </div>
                 </form>
               </Modal>
           </div>
           <div className="container" style={{display: 'flex', flexDirection:'row', flexWrap: 'wrap'}}>
           {docRender}
-        </div>
+          </div>
 
-          <Droppable
-            type={['document']}
-            onDrop={this.onDrop.bind(this)}>
-            <p> Drop Me Here </p>
-          </Droppable>
+            <div className="addDoc" style={{position: 'fixed', bottom: 10, left: 10}}>
+              <i onClick = {this.openModal} className="fa fa-3x fa-plus-circle"></i>
+            </div>
+            <div style={{position: 'fixed', bottom: 10, right: 10}}>
+              <Droppable
+                type={['document']}
+                onDrop={this.onDrop.bind(this)}>
+                <i className="fa fa-3x fa-trash"></i>
+              </Droppable>
+            </div>
         </div>
       )
     )
