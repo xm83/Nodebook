@@ -75,7 +75,7 @@ export default class TextBox extends React.Component {
   }
   // track what the user is changing
   onChange = (editorState) => {
-    this.search('')
+    this.setState({search: ""})
     const next = convertToRaw(editorState.getCurrentContent())
     const last = convertToRaw(this.state.editorState.getCurrentContent())
     let changed = false;
@@ -121,7 +121,7 @@ export default class TextBox extends React.Component {
 }
   // sync remote document edits to our editor
   remoteStateChange = (res) => {
-    
+
     if (res.rawState){
       let update = EditorState.createWithContent(convertFromRaw(res.rawState))
       let update2 = EditorState.forceSelection(update, this.state.editorState.getSelection())
@@ -173,7 +173,7 @@ export default class TextBox extends React.Component {
     let state = this.state.editorState;
     let set = state.getCurrentInlineStyle();
     let updated = state.getCurrentContent();
-    
+
     console.log("set:", set);
     for (let item of set.keys()) {
       console.log("item:", item);
@@ -185,12 +185,12 @@ export default class TextBox extends React.Component {
         updated = Modifier.removeInlineStyle(updated, state.getSelection(), item);
       }
     }
-    // apply new font if font is passed in 
+    // apply new font if font is passed in
     if (typeof font === "string") {
       console.log("font:", font);
       updated = Modifier.applyInlineStyle(updated, state.getSelection(), font);
       let newEditorState = EditorState.createWithContent(updated);
-      this.onChange(newEditorState);   
+      this.onChange(newEditorState);
     } else {
       let newEditorState = EditorState.createWithContent(updated);
       this.setState({editorState: newEditorState}, () => {
@@ -390,11 +390,11 @@ export default class TextBox extends React.Component {
             }
           }}>RegEx</button><br />
           {blockStyles.map(({ style, title }) =>
-          (<button key={title} onClick={() => { 
+          (<button key={title} onClick={() => {
             this.toggleFont(() => {
-              this.block(style); 
+              this.block(style);
             });
-          
+
           }}>{title}</button>))}
           <br />
           <button onClick={() => { this.inline('BOLD'); }}><b>B</b></button>

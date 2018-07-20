@@ -160,7 +160,8 @@ class Doc extends React.Component {
     let collabNames = this.state.collaborators.map((collab) => {
       return (
         <li className="Collabs">
-          {collab.firstName} {collab.lastName} <Button type="Remove" onClick={() => this.removeColl(collab._id)} />
+          {collab.firstName} {collab.lastName}
+          <button style={{marginLeft: '80px'}} className="btn btn-dark button" onClick={() => this.removeColl(collab._id)}>Remove</button>
         </li>
       )
     });
@@ -201,7 +202,7 @@ class Doc extends React.Component {
                 onChange={(e)=>this.setState({email: e.target.value})}></input>
               </div>
               <div className="modalButtons">
-                <Button type = "Share" onClick={this.share}/>
+                <Button type="Share" onClick={this.share}/>
                 <Button type="Cancel" onClick={this.closeModal}/>
               </div>
             </form>

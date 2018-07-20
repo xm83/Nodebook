@@ -235,13 +235,12 @@ class MainHub extends React.Component {
                 },
                 content: {
                   position: 'absolute',
-                  top: '40%',
+                  top: '38%',
                   left: '30%',
                   right: '30%',
-                  bottom: '40%',
+                  bottom: '38%',
                   border: '1px solid #ccc',
                   background: '#fff',
-                  overflow: 'auto',
                   WebkitOverflowScrolling: 'touch',
                   borderRadius: '4px',
                   outline: 'none',
@@ -260,7 +259,7 @@ class MainHub extends React.Component {
                   </div>
                   <br/>
                   <div className="modalButtons">
-                    <button style={{marginRight: '1 vw'}} type="button" className="btn btn-dark button" onClick = {this.closeModal}>Return</button>
+                    <button style={{marginRight: '10px'}} type="button" className="btn btn-dark button" onClick = {this.closeModal}>Cancel</button>
                     <button type="button" className="btn btn-dark button" onClick={()=>this.create()}>Create</button>
                   </div>
                 </form>
