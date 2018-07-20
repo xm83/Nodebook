@@ -6,6 +6,13 @@ import axios from 'axios';
 import Button from './Button';
 import _ from 'underscore';
 const blockStyles = [
+  { style: 'text-align-left', title: 'Left' },
+  { style: 'text-align-center', title: 'Center' },
+  { style: 'text-align-right', title: 'Right' },
+  { style: 'ordered-list-item', title: 'Numbered List' },
+  { style: 'unordered-list-item', title: 'Bullet Points' },
+];
+const fontStyles = [
   { style: 'header-one', title: 'H1' },
   { style: 'header-two', title: 'H2' },
   { style: 'header-three', title: 'H3' },
@@ -13,12 +20,8 @@ const blockStyles = [
   { style: 'header-five', title: 'H5' },
   { style: 'header-six', title: 'H6' },
   { style: 'blockquote', title: 'Quote' },
-  { style: 'text-align-left', title: 'Left' },
-  { style: 'text-align-center', title: 'Center' },
-  { style: 'text-align-right', title: 'Right' },
-  { style: 'ordered-list-item', title: 'Numbered List' },
-  { style: 'unordered-list-item', title: 'Bullet Points' },
-];
+
+]
 function getBlockStyle(block) {
   const type = block.getType();
   return (type.indexOf('text-align-') === 0) ? type : null;
@@ -193,7 +196,10 @@ export default class TextBox extends React.Component {
       this.onChange(newEditorState);
     } else {
       let newEditorState = EditorState.createWithContent(updated);
-      this.setState({editorState: newEditorState}, () => {
+
+      let update2 = EditorState.forceSelection(newEditorState, this.state.editorState.getSelection())
+      
+      this.setState({editorState: update2}, () => {
         // call the callback, which is this.block(style)
         font()
       })
@@ -391,6 +397,15 @@ export default class TextBox extends React.Component {
           }}>RegEx</button><br />
           {blockStyles.map(({ style, title }) =>
           (<button key={title} onClick={() => {
+            // this.toggleFont(() => {
+            //   this.block(style);
+            // });
+            this.block(style);
+
+          }}>{title}</button>))}
+          {fontStyles.map(({ style, title }) =>
+          (<button key={title} onClick={() => {
+            
             this.toggleFont(() => {
               this.block(style);
             });
