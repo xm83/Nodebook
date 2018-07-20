@@ -167,9 +167,11 @@ class Doc extends React.Component {
 
     return (!this.state.versionDisplay ?
       (<div style={{height: '100vh', background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)'}}>
-        <nav className="navbar navbar-light bg-light">
+        <nav className="navbar" style={{background: 'white'}}>
           <div>
-          <a class="navbar-brand" onClick={()=>this.props.goHome()} href="#">Dropdox</a>
+            <a className="navbar-brand" onClick={() => this.goHome()} href="#">
+              <img style={{height: '40px'}} className = 'navLogo' src={'https://i.imgur.com/VpF5stX.png'} alt={'cant get image'} width='70'/>
+            </a>
           </div>
           <form className="form-inline">
             {/* <Button type="Version History" onClick={() => this.showVersions()} revert={()=>this.revert()} /> */}
