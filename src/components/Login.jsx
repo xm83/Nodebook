@@ -18,8 +18,9 @@ class Login extends React.Component {
              <h2 style={{marginTop: '10vh', paddingBottom: '3vh'}}>Welcome</h2>
              <LoginBlock toggleReg={this.props.toggleReg} logIn={this.props.logIn}/>
              <div style={{color: 'grey', paddingTop: '15vh'}} className="textMuted">
-                 We hope you enjoy NAME HERE as much as we do, please login to your account below or register if this is your first time using our product
+                 We hope you enjoy MeerDocs as much as we do, please login to your account below or register if this is your first time using our product
              </div>
+             <div><img style={{marginTop: '2vh'}} className = 'navLogo' src={'https://i.imgur.com/EeRNcBe.png'} alt={'cant get image'} width='70'/></div>
            </center>
            </div>);
   }

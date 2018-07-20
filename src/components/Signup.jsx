@@ -61,9 +61,8 @@ class Signup extends Component {
   render() {
     return (
       <div>
-        <div className="text-right" style={{paddingRight: '5vh', paddingTop: '5vh', paddingBottom: '3vh'}}><Button type = "Return To Login" onClick={()=>this.props.toggleReg()}/></div>
       <center>
-        <form style={{paddingTop: '3vh'}} className="well">
+        <form style={{marginTop: '15vh'}} className="well">
         <h3 className="title"> Sign up </h3>
         <h2>{this.state.msg}</h2>
         <FormLine name = "FirstName" type = "text" value = {this.state.firstName} onChange={(e)=> this.setState({
@@ -83,6 +82,11 @@ class Signup extends Component {
         })}/>
         <Button type = "Submit" onClick={()=>this.Submit()}/>
       </form>
+      <div style={{paddingTop: '3vh'}}><button style={{ color: 'grey' }} type="button" className="btn btn-link btn-sm" onClick={()=>this.props.toggleReg()}>Already a fan of MeerDocs? Click here to login.</button></div>
+      <div style={{color: 'grey', paddingTop: '15vh'}} className="textMuted">
+          We hope you enjoy MeerDocs as much as we do, please create an account so you can begin using our product
+      </div>
+      <div><img style={{marginTop: '2vh'}} className = 'navLogo' src={'https://i.imgur.com/EeRNcBe.png'} alt={'cant get image'} width='70'/></div>
     </center>
     </div>
     );
