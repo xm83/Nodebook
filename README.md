@@ -1,5 +1,6 @@
 # google-doc-clone
 Real-time text editor:
+
 	• Built desktop application using Electron
 	
 	• Built contentEditable based collaborative rich text editor with React
