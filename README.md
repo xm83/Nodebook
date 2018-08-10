@@ -1,4 +1,4 @@
-# Nodebook
+# GoogleDoc Desktop: taking Google Doc from web tabs to your desktop!
 Real-time text editor:
 
 	• Built desktop application using Electron
