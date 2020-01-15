@@ -1,5 +1,8 @@
-# GoogleDoc Desktop: taking Google Doc from web tabs to your desktop!
-Real-time text editor:
+# :computer: GoogleDoc Desktop :computer: 
+
+A Real-time text editor: taking Google Doc from web tabs to your desktop!
+
+## Technical Accomplishments :tada:
 
 	• Built desktop application using Electron
 	
