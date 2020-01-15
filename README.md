@@ -4,14 +4,10 @@ A Real-time text editor: taking Google Doc from web tabs to your desktop!
 
 ## Technical Accomplishments :tada:
 
-	• Built desktop application using Electron
+	* Architected a desktop app that allows rich-text real-time editing collaboration for **multiple** users
 	
-	• Built contentEditable based collaborative rich text editor with React and DraftJS
+	* Built a **RESTful** API using ExpressJS for authentication (**PassportJS**), real-time collaboration (**socket.io**), and storage (**MongoDB**)
 	
-	• Architected modular single-page application using React
+	* Leveraged **Electron** and **React** to build single-page app  with client-side rendering and routing, using **DraftJS** for rich-text editing
 	
-	• Leveraged Bootstrap to achieve professional look-and-feel
-	
-	• Implemented sharing functionality by persisting user info and document content state in a MongoDB database
-	
-	• Enabled real time collaboration using WebSockets
+	* Worked on a team of four developers, managing versions and resolving merge conflicts with **git**
